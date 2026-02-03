@@ -20,6 +20,10 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
+Route::get('/courses', [HomeController::class, 'courses'])->name('courses');
+// Route::post('/', function () {
+//     return redirect('/');
+// });
 
 // ========== Authentication Routes ==========
 
@@ -110,9 +114,6 @@ Route::middleware(['auth', 'student'])->prefix('student')->name('student.')->gro
     Route::get('my-courses', [\App\Http\Controllers\Student\EnrollmentController::class, 'myCourses'])->name('my-courses');
     Route::get('learn/{enrollment}', [\App\Http\Controllers\Student\EnrollmentController::class, 'learn'])->name('learn');
 
-    // Certificates
-    Route::get('certificates', [\App\Http\Controllers\Student\CertificateController::class, 'index'])->name('certificates.index');
-    Route::get('certificates/{certificate}/download', [\App\Http\Controllers\Student\CertificateController::class, 'download'])->name('certificates.download');
 });
 
 

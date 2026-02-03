@@ -64,13 +64,6 @@ class Enrollment extends Model
         return $this->belongsTo(Subscription::class);
     }
 
-    /**
-     * Certificate if completed.
-     */
-    public function certificate()
-    {
-        return $this->hasOne(Certificate::class);
-    }
 
     // ========== Helper Methods ==========
 

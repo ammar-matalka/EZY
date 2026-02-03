@@ -88,13 +88,7 @@ class User extends Authenticatable
         return $this->hasMany(Enrollment::class, 'student_id');
     }
 
-    /**
-     * Certificates earned by this student.
-     */
-    public function certificates()
-    {
-        return $this->hasMany(Certificate::class, 'student_id');
-    }
+  
 
     /**
      * Payments made by this user.

@@ -21,29 +21,20 @@ class DashboardController extends Controller
         $stats = [
             'enrolled_courses' => $student->enrollments()->where('status', 'active')->count(),
             'completed_courses' => $student->enrollments()->where('status', 'completed')->count(),
-            'certificates_earned' => $student->certificates()->count(),
             'remaining_courses' => $subscription ? $subscription->remainingCourses() : 0,
         ];
 
-        // Recent enrollments
-        $recentEnrollments = $student->enrollments()
-            ->with('course.teacher')
+        // Get enrolled courses with details
+        $enrolledCourses = $student->enrollments()
+            ->where('status', 'active')
+            ->with(['course.teacher', 'course.modules'])
             ->latest()
-            ->take(5)
-            ->get();
-
-        // Recent certificates
-        $recentCertificates = $student->certificates()
-            ->with('course')
-            ->latest()
-            ->take(3)
             ->get();
 
         return view('student.dashboard', compact(
             'subscription',
             'stats',
-            'recentEnrollments',
-            'recentCertificates'
+            'enrolledCourses'
         ));
     }
 }

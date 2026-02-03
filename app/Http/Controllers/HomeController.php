@@ -67,4 +67,51 @@ class HomeController extends Controller
     {
         return view('home.faq');
     }
+
+    /**
+     * Display courses page (public).
+     */
+    public function courses(Request $request)
+    {
+        $query = Course::with('teacher');
+
+        // Filter by status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        } else {
+            // Show only opened courses by default
+            $query->where('status', 'opened');
+        }
+
+        // Search by title
+        if ($request->has('search') && $request->search != '') {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+
+        // Sorting
+        if ($request->has('sort')) {
+            switch ($request->sort) {
+                case 'oldest':
+                    $query->oldest();
+                    break;
+                case 'title':
+                    $query->orderBy('title', 'asc');
+                    break;
+                default:
+                    $query->latest();
+            }
+        } else {
+            $query->latest();
+        }
+
+        $courses = $query->paginate(12);
+
+        // Get categories for filter
+        $categories = Course::where('status', 'opened')
+            ->distinct()
+            ->pluck('category')
+            ->filter();
+
+        return view('home.courses', compact('courses', 'categories'));
+    }
 }

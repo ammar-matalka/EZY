@@ -13,8 +13,15 @@ class CourseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Course::where('status', 'opened')
-            ->with('teacher');
+        $query = Course::with('teacher');
+
+        // Filter by status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        } else {
+            // Show only opened courses by default
+            $query->where('status', 'opened');
+        }
 
         // Filter by category
         if ($request->has('category') && $request->category != '') {
@@ -31,7 +38,23 @@ class CourseController extends Controller
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        $courses = $query->latest()->paginate(12);
+        // Sorting
+        if ($request->has('sort')) {
+            switch ($request->sort) {
+                case 'oldest':
+                    $query->oldest();
+                    break;
+                case 'title':
+                    $query->orderBy('title', 'asc');
+                    break;
+                default:
+                    $query->latest();
+            }
+        } else {
+            $query->latest();
+        }
+
+        $courses = $query->paginate(12);
 
         // Get categories for filter
         $categories = Course::where('status', 'opened')
@@ -65,5 +88,10 @@ class CourseController extends Controller
         $canEnroll = !$isEnrolled && $student->canEnroll();
 
         return view('student.courses.show', compact('course', 'isEnrolled', 'canEnroll'));
-    }
+{
+    $courses = Course::where('status', 'opened')->latest()->paginate(12);
+    return view('courses', compact('courses'));
 }
+        }
+}
+

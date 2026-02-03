@@ -3,51 +3,50 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     /**
-     * Display teacher dashboard.
+     * Display teacher dashboard
      */
     public function index()
     {
         $teacher = auth()->user();
 
-        // Statistics for this teacher only
+        // Statistics
         $stats = [
-            'total_courses' => $teacher->courses()->count(),
-            'active_courses' => $teacher->courses()->where('status', 'opened')->count(),
-            'total_students' => $teacher->courses()
-                ->withCount('enrollments')
-                ->get()
-                ->sum('enrollments_count'),
-            'completed_enrollments' => $teacher->courses()
-                ->with(['enrollments' => function ($q) {
-                    $q->where('status', 'completed');
-                }])
-                ->get()
-                ->sum(function ($course) {
-                    return $course->enrollments->count();
-                }),
+            'courses' => $teacher->courses()->count(),
+            'opened_courses' => $teacher->courses()->where('status', 'opened')->count(),
+            'students' => Enrollment::whereHas('course', function($q) use ($teacher) {
+                $q->where('teacher_id', $teacher->id);
+            })->distinct('student_id')->count('student_id'),
+            'modules' => $teacher->courses()->withCount('modules')->get()->sum('modules_count'),
+            'projects' => $teacher->courses()->withCount('projects')->get()->sum('projects_count'),
         ];
 
-        // Recent enrollments in my courses
-        $recentEnrollments = \App\Models\Enrollment::whereHas('course', function ($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id);
-            })
-            ->with(['student', 'course'])
-            ->latest()
-            ->take(10)
-            ->get();
-
-        // My courses
-        $myCourses = $teacher->courses()
-            ->withCount('enrollments')
+        // Recent Courses (last 5)
+        $recentCourses = $teacher->courses()
+            ->with(['modules', 'enrollments'])
             ->latest()
             ->take(5)
             ->get();
 
-        return view('teacher.dashboard', compact('stats', 'recentEnrollments', 'myCourses'));
+        // Recent Students (last 10)
+        $recentStudents = Enrollment::with(['student', 'course'])
+            ->whereHas('course', function($q) use ($teacher) {
+                $q->where('teacher_id', $teacher->id);
+            })
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('teacher.dashboard', compact(
+            'stats',
+            'recentCourses',
+            'recentStudents'
+        ));
     }
 }
