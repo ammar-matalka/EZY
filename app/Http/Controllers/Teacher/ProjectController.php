@@ -15,7 +15,7 @@ class ProjectController extends Controller
     public function create(Course $course)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         return view('teacher.projects.create', compact('course'));
     }
@@ -26,7 +26,7 @@ class ProjectController extends Controller
     public function store(Request $request, Course $course)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -50,7 +50,7 @@ class ProjectController extends Controller
     public function edit(Course $course, Project $project)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         return view('teacher.projects.edit', compact('course', 'project'));
     }
@@ -61,7 +61,7 @@ class ProjectController extends Controller
     public function update(Request $request, Course $course, Project $project)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -85,7 +85,7 @@ class ProjectController extends Controller
     public function destroy(Course $course, Project $project)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         $project->delete();
 

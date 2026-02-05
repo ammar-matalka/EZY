@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\User;
+use App\Models\Certification;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -26,6 +27,9 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
+        // Get certifications
+        $certifications = Certification::all();
+
         // Statistics
         $stats = [
             'students' => User::where('role', 'student')->count(),
@@ -33,7 +37,12 @@ class HomeController extends Controller
             'instructors' => User::where('role', 'teacher')->count(),
         ];
 
-        return view('home.index', compact('featuredCourses', 'topInstructors', 'stats'));
+        return view('home.index', compact(
+            'featuredCourses',
+            'topInstructors',
+            'stats',
+            'certifications'
+        ));
     }
 
     /**
@@ -79,7 +88,6 @@ class HomeController extends Controller
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         } else {
-            // Show only opened courses by default
             $query->where('status', 'opened');
         }
 

@@ -16,7 +16,7 @@ class Course extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'teacher_id',
+        'user_id',
         'title',
         'slug',
         'description',
@@ -46,7 +46,7 @@ class Course extends Model
      */
     public function teacher()
     {
-        return $this->belongsTo(User::class, 'teacher_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -73,7 +73,7 @@ class Course extends Model
         return $this->hasMany(Enrollment::class);
     }
 
-   
+
 
     // ========== Helper Methods ==========
 

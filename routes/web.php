@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PricingController;
+use App\Http\Controllers\Admin\CertificationController;
+use App\Http\Controllers\SubscriptionController;
+
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\UserController;
@@ -18,12 +22,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
-Route::get('/pricing', [HomeController::class, 'pricing'])->name('pricing');
+Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
-Route::get('/courses', [HomeController::class, 'courses'])->name('courses');
-// Route::post('/', function () {
-//     return redirect('/');
-// });
+
+// Courses - Available for everyone (guests + authenticated users)
+Route::get('/courses', [\App\Http\Controllers\Student\CourseController::class, 'index'])->name('courses.index');
+Route::get('/courses/{course:slug}', [\App\Http\Controllers\Student\CourseController::class, 'show'])->name('courses.show');
 
 // ========== Authentication Routes ==========
 
@@ -65,6 +69,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Enrollment Management
     Route::get('enrollments', [\App\Http\Controllers\Admin\EnrollmentController::class, 'index'])->name('enrollments.index');
     Route::delete('enrollments/{enrollment}', [\App\Http\Controllers\Admin\EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+    Route::get('certifications', [CertificationController::class, 'index'])->name('certifications.index');
+    Route::get('certifications/create', [CertificationController::class, 'create'])->name('certifications.create');
+    Route::post('certifications', [CertificationController::class, 'store'])->name('certifications.store');
+    Route::delete('certifications/{id}', [CertificationController::class, 'destroy'])->name('certifications.destroy');
 });
 
 // ========== Teacher Routes ==========
@@ -100,10 +108,6 @@ Route::middleware(['auth', 'student'])->prefix('student')->name('student.')->gro
     // Dashboard
     Route::get('/dashboard', [\App\Http\Controllers\Student\DashboardController::class, 'index'])->name('dashboard');
 
-    // Browse Courses
-    Route::get('courses', [\App\Http\Controllers\Student\CourseController::class, 'index'])->name('courses.index');
-    Route::get('courses/{course}', [\App\Http\Controllers\Student\CourseController::class, 'show'])->name('courses.show');
-
     // Plans & Subscription
     Route::get('plans', [\App\Http\Controllers\Student\SubscriptionController::class, 'choosePlan'])->name('plans.choose');
     Route::post('subscribe/{plan}', [\App\Http\Controllers\Student\SubscriptionController::class, 'subscribe'])->name('subscribe');
@@ -115,8 +119,32 @@ Route::middleware(['auth', 'student'])->prefix('student')->name('student.')->gro
     Route::get('learn/{enrollment}', [\App\Http\Controllers\Student\EnrollmentController::class, 'learn'])->name('learn');
 
 });
+Route::post('/subscribe/{plan}', [\App\Http\Controllers\Student\SubscriptionController::class, 'subscribe'])->name('subscribe');
 
 
+
+Route::middleware(['auth'])->group(function () {
+
+    // Subscribe to a plan
+    Route::post('/subscribe/{plan}', [SubscriptionController::class, 'subscribe'])
+         ->name('subscribe');
+
+    // Course selection page
+    Route::get('/subscription/select-courses', [SubscriptionController::class, 'selectCourses'])
+         ->name('subscription.select-courses');
+
+    // Add course to subscription (AJAX) - Permanent, cannot be removed
+    Route::post('/subscription/add-course/{course}', [SubscriptionController::class, 'addCourse'])
+         ->name('subscription.add-course');
+
+    // Confirm course selection
+    Route::post('/subscription/confirm', [SubscriptionController::class, 'confirmSelection'])
+         ->name('subscription.confirm');
+
+    // My courses page
+    Route::get('/my-courses', [SubscriptionController::class, 'myCourses'])
+         ->name('my-courses');
+});
 
 
 
@@ -604,7 +632,8 @@ Route::get('/project-structure', function () {
             <div class="footer">
                 <p>Generated at <?php echo now()->format('Y-m-d H:i:s'); ?></p>
                 <p style="margin-top: 10px; color: #999;">Laravel <?php echo $laravelVersion; ?> | PHP
-                    <?php echo $phpVersion; ?></p>
+                    <?php echo $phpVersion; ?>
+                </p>
             </div>
         </div>
 

@@ -38,16 +38,16 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'teacher_id' => ['required', 'exists:users,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'level' => ['required', 'in:beginner,intermediate,advanced'],
-            'duration' => ['nullable', 'integer', 'min:1'],
-            'status' => ['required', 'in:opened,coming_soon,archived'],
-            'image' => ['nullable', 'image', 'max:2048'],
-        ]);
+       $request->validate([
+    'title' => ['required', 'string', 'max:255'],
+    'description' => ['required', 'string'],
+    'category' => ['nullable', 'string', 'max:255'],
+    'level' => ['required', 'in:beginner,intermediate,advanced'],
+    'duration' => ['nullable', 'integer', 'min:1'],
+    'status' => ['required', 'in:opened,coming_soon,archived'],
+    'image' => ['nullable', 'image', 'max:2048'],
+]);
+
 
         // Handle image upload
         $imagePath = null;
@@ -56,17 +56,18 @@ class CourseController extends Controller
         }
 
         // Create course
-        $course = Course::create([
-            'teacher_id' => $request->teacher_id,
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'description' => $request->description,
-            'category' => $request->category,
-            'level' => $request->level,
-            'duration' => $request->duration,
-            'status' => $request->status,
-            'image' => $imagePath,
-        ]);
+     $course = Course::create([
+    'user_id' => auth()->id(),
+    'title' => $request->title,
+    'slug' => Str::slug($request->title),
+    'description' => $request->description,
+    'category' => $request->category,
+    'level' => $request->level,
+    'duration' => $request->duration,
+    'status' => $request->status,
+    'image' => $imagePath,
+]);
+
 
         return redirect()->route('admin.courses.index')
             ->with('success', 'Course created successfully!');
@@ -98,7 +99,6 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         $request->validate([
-            'teacher_id' => ['required', 'exists:users,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'category' => ['nullable', 'string', 'max:255'],
@@ -119,15 +119,16 @@ class CourseController extends Controller
 
         // Update course
         $course->update([
-            'teacher_id' => $request->teacher_id,
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'description' => $request->description,
-            'category' => $request->category,
-            'level' => $request->level,
-            'duration' => $request->duration,
-            'status' => $request->status,
-        ]);
+    'user_id' => auth()->id(),
+    'title' => $request->title,
+    'slug' => Str::slug($request->title),
+    'description' => $request->description,
+    'category' => $request->category,
+    'level' => $request->level,
+    'duration' => $request->duration,
+    'status' => $request->status,
+]);
+
 
         return redirect()->route('admin.courses.index')
             ->with('success', 'Course updated successfully!');

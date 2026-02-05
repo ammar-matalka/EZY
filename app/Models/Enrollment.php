@@ -15,7 +15,7 @@ class Enrollment extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'student_id',
+        'user_id',
         'course_id',
         'subscription_id',
         'progress',
@@ -41,11 +41,11 @@ class Enrollment extends Model
     // ========== Relationships ==========
 
     /**
-     * Student who enrolled.
+     * User who enrolled.
      */
-    public function student()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'student_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -63,7 +63,6 @@ class Enrollment extends Model
     {
         return $this->belongsTo(Subscription::class);
     }
-
 
     // ========== Helper Methods ==========
 

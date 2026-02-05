@@ -38,14 +38,15 @@ class EnrollmentController extends Controller
         $subscription = $student->activeSubscription;
 
         // Create enrollment
-        Enrollment::create([
-            'student_id' => $student->id,
-            'course_id' => $course->id,
-            'subscription_id' => $subscription->id,
-            'progress' => 0,
-            'status' => 'active',
-            'enrolled_at' => now(),
-        ]);
+      Enrollment::create([
+    'user_id' => auth()->id(),
+    'course_id' => $course->id,
+    'subscription_id' => $subscription->id,
+    'progress' => 0,
+    'status' => 'active',
+    'enrolled_at' => now(),
+]);
+
 
         return redirect()->route('student.my-courses')
             ->with('success', 'Successfully enrolled in ' . $course->title . '!');
@@ -72,7 +73,7 @@ class EnrollmentController extends Controller
     public function learn(Enrollment $enrollment)
     {
         // Ensure student owns this enrollment
-        if ($enrollment->student_id !== auth()->id()) {
+        if ($enrollment->user_id !== auth()->id()) {
             abort(403);
         }
 

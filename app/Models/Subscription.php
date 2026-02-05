@@ -9,118 +9,73 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'student_id',
+        'user_id',
         'plan_id',
-        'status',
-        'started_at',
+        'courses_limit',
+        'courses_selected',
+        'starts_at',
         'expires_at',
+        'status',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'starts_at' => 'datetime',
+        'expires_at' => 'datetime',
+    ];
+
+    // Relations
+    public function user()
     {
-        return [
-            'started_at' => 'datetime',
-            'expires_at' => 'datetime',
-        ];
+        return $this->belongsTo(User::class);
     }
 
-    // ========== Relationships ==========
-
-    /**
-     * Student who owns this subscription.
-     */
-    public function student()
-    {
-        return $this->belongsTo(User::class, 'student_id');
-    }
-
-    /**
-     * Plan associated with this subscription.
-     */
     public function plan()
     {
         return $this->belongsTo(Plan::class);
     }
 
-    /**
-     * Enrollments under this subscription.
-     */
-    public function enrollments()
+    public function courses()
     {
-        return $this->hasMany(Enrollment::class);
+        return $this->belongsToMany(Course::class, 'subscription_courses')
+                    ->withPivot('enrolled_at')
+                    ->withTimestamps();
     }
 
-    /**
-     * Payments for this subscription.
-     */
-    public function payments()
+    // Check if user can select more courses
+    public function canSelectMore(): bool
     {
-        return $this->hasMany(Payment::class);
+        return $this->courses_selected < $this->courses_limit;
     }
 
-    // ========== Helper Methods ==========
-
-    /**
-     * Check if subscription is active.
-     */
-    public function isActive()
+    // Get remaining slots
+    public function remainingSlots(): int
     {
-        return $this->status === 'active';
+        return max(0, $this->courses_limit - $this->courses_selected);
     }
 
-    /**
-     * Check if subscription is expired.
-     */
-    public function isExpired()
+    // Check if subscription is active
+    public function isActive(): bool
     {
-        return $this->status === 'expired';
+        return $this->status === 'active' && $this->expires_at->isFuture();
     }
 
-    /**
-     * Check if subscription is cancelled.
-     */
-    public function isCancelled()
+    // Check if course is already selected
+    public function hasCourse($courseId): bool
     {
-        return $this->status === 'cancelled';
+        return $this->courses()->where('course_id', $courseId)->exists();
     }
 
-    /**
-     * Get enrolled courses count.
-     */
-    public function enrolledCoursesCount()
+    // Scope for active subscriptions
+    public function scopeActive($query)
     {
-        return $this->enrollments()->where('status', 'active')->count();
+        return $query->where('status', 'active')
+                     ->where('expires_at', '>', now());
     }
-
-    /**
-     * Get remaining courses.
-     */
-    public function remainingCourses()
-    {
-        $enrolled = $this->enrolledCoursesCount();
-        return max(0, $this->plan->courses_limit - $enrolled);
-    }
-
-    /**
-     * Check if can enroll more courses.
-     */
-    public function canEnrollMore()
-    {
-        if (!$this->isActive()) {
-            return false;
-        }
-
-        return $this->enrolledCoursesCount() < $this->plan->courses_limit;
-    }
+    // Get remaining courses (alias for remainingSlots)
+public function remainingCourses(): int
+{
+    return $this->remainingSlots();
 }
+}
+

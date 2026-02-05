@@ -7,7 +7,7 @@
 {{-- ========================================
     HERO SECTION
 ========================================= --}}
-<section class="bg-gradient-to-br from-blue-50 to-white py-16 md:py-20">
+<section class=" from-blue-50 to-white py-16 md:py-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
@@ -27,7 +27,7 @@
                 <!-- Search Bar & Category Pills -->
                 <div class="space-y-4">
                     <!-- Search Input -->
-                    <form action="{{ route('courses') }}" method="GET" class="flex">
+                    <form action="{{ route('courses.index') }}" method="GET" class="flex">
                         <input
                             type="text"
                             name="search"
@@ -44,19 +44,19 @@
 
                     <!-- Category Pills -->
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('courses') }}?category=Cloud Computing" class="px-5 py-2.5 bg-orange text-white rounded-lg font-medium hover:bg-orange-light transition">
+                        <a href="{{ route('courses.index') }}?category=Cloud Computing" class="px-5 py-2.5 bg-orange text-white rounded-lg font-medium hover:bg-orange-light transition">
                             Cloud Computing
                         </a>
-                        <a href="{{ route('courses') }}?category=Cyber Security" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+                        <a href="{{ route('courses.index') }}?category=Cyber Security" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                             Cyber Security
                         </a>
-                        <a href="{{ route('courses') }}?category=DevOps" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+                        <a href="{{ route('courses.index') }}?category=DevOps" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                             DevOps
                         </a>
-                        <a href="{{ route('courses') }}?category=Data Science" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+                        <a href="{{ route('courses.index') }}?category=Data Science" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                             Data Science
                         </a>
-                        <a href="{{ route('courses') }}?category=Software Testing" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+                        <a href="{{ route('courses.index') }}?category=Software Testing" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                             Software Testing
                         </a>
                     </div>
@@ -169,7 +169,7 @@
 {{-- ========================================
     SKILL DEVELOPMENT SCHEMES SECTION
 ========================================= --}}
-<section class="py-16 bg-gray-50">
+<section class="py-16 ">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
@@ -262,215 +262,222 @@
 {{-- ========================================
     HOW IT WORKS SECTION
 ========================================= --}}
-<section class="py-16 bg-white relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Section Header -->
-        <div class="text-center mb-12">
-            <div class="inline-block px-6 py-3 bg-orange text-white font-semibold rounded-full mb-4">
-                How It Works
+{{-- ========================================
+    HOW IT WORKS SECTION (React Design)
+========================================= --}}
+<section class="w-full bg-white py-16 lg:py-24 relative overflow-hidden">
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+
+        <!-- Title Badge (Floating Effect) -->
+        <div class="flex justify-center -mb-6 md:-mb-8 relative z-20">
+            <div class="bg-[#FF8C42] text-white px-8 md:px-12 py-3 md:py-4 rounded-xl shadow-lg">
+                <h2 class="text-xl md:text-3xl font-bold">How It Works</h2>
             </div>
         </div>
 
-        <!-- Process Flow -->
-        <div class="bg-primary rounded-3xl p-8 md:p-12 relative overflow-hidden">
-            <!-- Decorative circles -->
-            <div class="absolute top-10 right-10 w-32 h-32 bg-orange rounded-full opacity-20"></div>
+        <!-- Decorative Orange Ring (Top Right) -->
+        <div class="absolute top-[-50px] right-[-50px] w-50 h-50 md:w-50 md:h-50 rounded-full border-[2rem] border-[#FF8C42] opacity-100 z-0 hidden lg:block"></div>
 
-            <div class="relative z-10">
-                <div class="flex flex-wrap items-center justify-between gap-8">
-                    <!-- Job Seeker -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-2xl p-6 w-32 mx-auto mb-4">
-                            <img src="{{ asset('images/job-seeker.png') }}" alt="Job Seeker" class="w-full h-auto">
-                        </div>
-                        <p class="text-white font-semibold">Job Seeker</p>
-                        <!-- Dots decoration -->
-                        <div class="mt-4 flex justify-center gap-1">
-                            @for($i = 0; $i < 4; $i++)
-                                <div class="w-2 h-2 bg-orange rounded-full"></div>
-                            @endfor
-                        </div>
-                    </div>
+        <!-- Blue Card Background -->
+        <div class="bg-[#003366] rounded-[2.5rem] p-8 md:p-12 lg:p-16 pt-16 md:pt-20 lg:pt-24 relative">
 
-                    <!-- Arrow -->
-                    <div class="text-white text-2xl hidden md:block">→</div>
 
-                    <!-- Step 01 - Assessment Aptitude Test -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-xl p-4 w-20 mx-auto mb-2">
-                            <svg class="w-full h-auto text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
-                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+
+            <div class="flex flex-col xl:flex-row items-center justify-between gap-6 relative z-10">
+
+                <!-- Start: Job Seeker Card -->
+                <div class="w-36 h-40 flex items-center justify-center flex-col bg-white rounded-2xl p-4 flex-shrink-0 relative">
+                    <span class="text-[#FF8C42] font-semibold mb-3 text-base">Job Seeker</span>
+                    <img src="{{ asset('images/job-seeker.png') }}" alt="Job Seeker" class="w-20 h-20 object-contain">
+               </div>
+
+                <!-- Arrow -->
+                <svg class="text-[#FF8C42] w-8 h-8 flex-shrink-0 hidden xl:block" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+
+                <!-- Flow Steps -->
+                <div class="flex-1 w-full py-8">
+                    <div class="flex flex-wrap items-center justify-center gap-4 mx-auto">
+
+                        <!-- Step 01 -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col items-center text-center gap-2 w-24">
+                                <span class="text-white font-bold text-base mb-1">01</span>
+                                <div class="w-14 h-14 rounded-xl border-2 border-[#FF8C42] flex items-center justify-center bg-transparent hover:bg-[#FF8C42]/10 transition-colors">
+                                    <svg class="text-white w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-white text-[10px] font-medium leading-tight max-w-[90px]">
+                                    Assessment Aptitude Test Interview
+                                </p>
+                            </div>
+                            <svg class="text-[#FF8C42] w-5 h-5 flex-shrink-0 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>
-                        <p class="text-xs text-white mb-1"><span class="font-bold">01</span></p>
-                        <p class="text-xs text-white">Assessment<br>Aptitude Test</p>
-                    </div>
 
-                    <!-- Arrow -->
-                    <div class="text-white text-2xl hidden md:block">→</div>
-
-                    <!-- Step 02 & 03 - Hands on Practice -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-xl p-4 w-20 mx-auto mb-2">
-                            <svg class="w-full h-auto text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 1a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zm4-4a1 1 0 100 2h.01a1 1 0 100-2H13zM9 9a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zM7 8a1 1 0 000 2h.01a1 1 0 000-2H7z" clip-rule="evenodd"/>
+                        <!-- Step 02 -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col items-center text-center gap-2 w-24">
+                                <span class="text-white font-bold text-base mb-1">02</span>
+                                <div class="w-14 h-14 rounded-xl border-2 border-[#FF8C42] flex items-center justify-center bg-transparent hover:bg-[#FF8C42]/10 transition-colors">
+                                    <svg class="text-white w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-white text-[10px] font-medium leading-tight max-w-[90px]">
+                                    Hands on Practice Scenarios, Test Cases
+                                </p>
+                            </div>
+                            <svg class="text-[#FF8C42] w-5 h-5 flex-shrink-0 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>
-                        <p class="text-xs text-white mb-1"><span class="font-bold">02</span> <span class="font-bold">03</span></p>
-                        <p class="text-xs text-white">Hands on Practice<br>Scenarios, Test<br>Cases</p>
-                    </div>
 
-                    <!-- Arrow -->
-                    <div class="text-white text-2xl hidden md:block">→</div>
-
-                    <!-- Step 04 - Soft Skills Training -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-xl p-4 w-20 mx-auto mb-2">
-                            <svg class="w-full h-auto text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                        <!-- Step 03 -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col items-center text-center gap-2 w-24">
+                                <span class="text-white font-bold text-base mb-1">03</span>
+                                <div class="w-14 h-14 rounded-xl border-2 border-[#FF8C42] flex items-center justify-center bg-transparent hover:bg-[#FF8C42]/10 transition-colors">
+                                    <svg class="text-white w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-white text-[10px] font-medium leading-tight max-w-[90px]">
+                                    Soft Skills & Business Training
+                                </p>
+                            </div>
+                            <svg class="text-[#FF8C42] w-5 h-5 flex-shrink-0 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>
-                        <p class="text-xs text-white mb-1"><span class="font-bold">04</span></p>
-                        <p class="text-xs text-white">Soft Skills &<br>Business Training</p>
-                    </div>
 
-                    <!-- Arrow -->
-                    <div class="text-white text-2xl hidden md:block">→</div>
-
-                    <!-- Step 05 - Daily Assessments -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-xl p-4 w-20 mx-auto mb-2">
-                            <svg class="w-full h-auto text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        <!-- Step 04 -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col items-center text-center gap-2 w-24">
+                                <span class="text-white font-bold text-base mb-1">04</span>
+                                <div class="w-14 h-14 rounded-xl border-2 border-[#FF8C42] flex items-center justify-center bg-transparent hover:bg-[#FF8C42]/10 transition-colors">
+                                    <svg class="text-white w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-white text-[10px] font-medium leading-tight max-w-[90px]">
+                                    Daily, Weekly, Monthly Assessments
+                                </p>
+                            </div>
+                            <svg class="text-[#FF8C42] w-5 h-5 flex-shrink-0 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>
-                        <p class="text-xs text-white mb-1"><span class="font-bold">05</span></p>
-                        <p class="text-xs text-white">Daily, Weekly, Monthly<br>Assessments</p>
-                    </div>
 
-                    <!-- Arrow -->
-                    <div class="text-white text-2xl hidden md:block">→</div>
-
-                    <!-- Step 06 - Real Time Projects -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-xl p-4 w-20 mx-auto mb-2">
-                            <svg class="w-full h-auto text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                        <!-- Step 05 -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col items-center text-center gap-2 w-24">
+                                <span class="text-white font-bold text-base mb-1">05</span>
+                                <div class="w-14 h-14 rounded-xl border-2 border-[#FF8C42] flex items-center justify-center bg-transparent hover:bg-[#FF8C42]/10 transition-colors">
+                                    <svg class="text-white w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                    </svg>
+                                </div>
+                                <p class="text-white text-[10px] font-medium leading-tight max-w-[90px]">
+                                    Real Time Project Hackathons
+                                </p>
+                            </div>
+                            <svg class="text-[#FF8C42] w-5 h-5 flex-shrink-0 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>
-                        <p class="text-xs text-white mb-1"><span class="font-bold">06</span></p>
-                        <p class="text-xs text-white">Real Time Project<br>Hackathons</p>
-                    </div>
 
-                    <!-- Arrow -->
-                    <div class="text-white text-2xl hidden md:block">→</div>
-
-                    <!-- Assessment Guidance -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-xl p-4 w-20 mx-auto mb-2">
-                            <svg class="w-full h-auto text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                            </svg>
+                        <!-- Step 06 -->
+                        <div class="flex items-center gap-3">
+                            <div class="flex flex-col items-center text-center gap-2 w-24">
+                                <span class="text-white font-bold text-base mb-1">06</span>
+                                <div class="w-14 h-14 rounded-xl border-2 border-[#FF8C42] flex items-center justify-center bg-transparent hover:bg-[#FF8C42]/10 transition-colors">
+                                    <svg class="text-white w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-white text-[10px] font-medium leading-tight max-w-[90px]">
+                                    Assessment Guidance & Monitoring
+                                </p>
+                            </div>
                         </div>
-                        <p class="text-xs text-white">Assessment Guidance<br>& Monitoring</p>
-                    </div>
-
-                    <!-- Arrow -->
-                    <div class="text-white text-2xl hidden md:block">→</div>
-
-                    <!-- Employed -->
-                    <div class="text-center">
-                        <div class="bg-white rounded-2xl p-6 w-32 mx-auto mb-4">
-                            <img src="{{ asset('images/employed.png') }}" alt="Employed" class="w-full h-auto">
-                        </div>
-                        <p class="text-white font-semibold">Employed</p>
                     </div>
                 </div>
+
+                <!-- Arrow -->
+                <svg class="text-[#FF8C42] w-8 h-8 flex-shrink-0 hidden xl:block" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+
+                <!-- End: Employed Card -->
+                <div class="w-36 h-40 flex items-center justify-center flex-col bg-white rounded-2xl p-4 flex-shrink-0">
+                    <span class="text-[#FF8C42] font-semibold mb-3 text-base">Employed</span>
+                    <img src="{{ asset('images/employed.png') }}" alt="Employed" class="w-20 h-20 object-contain">
+                </div>
+
             </div>
         </div>
     </div>
 </section>
-
 {{-- ========================================
     POPULAR COURSES SECTION
 ========================================= --}}
-<section class="py-16 bg-gray-50">
+<section class="py-16 ">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Header -->
         <div class="text-center mb-12">
             <h2 class="text-4xl font-bold mb-4">
-                <span class="text-primary">Popoular</span> <span class="text-orange">Courses</span>
+                <span class="text-primary">Popular</span> <span class="text-orange">Courses</span>
             </h2>
         </div>
 
         <!-- Courses Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             @forelse($featuredCourses as $course)
-                <div class="bg-primary rounded-2xl overflow-hidden hover:shadow-2xl transition duration-300 transform hover:-translate-y-2">
-                    <!-- Course Image -->
-                    <div class="h-48 bg-white flex items-center justify-center p-8">
-                        @if($course->image)
-                            <img src="{{ Storage::url($course->image) }}" alt="{{ $course->title }}" class="h-full w-auto object-contain">
-                        @else
-                            <div class="w-20 h-20 bg-orange rounded-2xl flex items-center justify-center">
-                                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
-                                </svg>
-                            </div>
-                        @endif
+                <a href="{{ route('courses.show', $course) }}" class="block relative pb-40 group">
+                    <!-- Blue Background -->
+                    <div class="h-72 bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl relative transition-transform group-hover:scale-105 duration-300">
+                        <div class="absolute top-6 left-1/2 transform -translate-x-1/2" style="width: 120px; height: 120px;">
+                            @if($course->image)
+                                <img src="{{ Storage::url($course->image) }}" alt="{{ $course->title }}" class="w-full h-full object-contain">
+                            @else
+                                <div class="text-cyan-300 text-6xl font-bold text-center">
+                                    {{ substr($course->title, 0, 1) }}
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
-                    <!-- Course Content -->
-                    <div class="p-6 space-y-4">
-                        <h3 class="text-xl font-bold text-white">{{ $course->title }}</h3>
+                    <!-- White Card Content -->
+                    <div class="absolute left-4 right-4 bg-white rounded-xl shadow-lg p-4 group-hover:shadow-2xl transition-shadow" style="top: 11rem;">
+                        <h3 class="text-lg font-black text-gray-900 mb-2 text-center group-hover:text-orange-500 transition-colors">
+                            {{ Str::limit($course->title, 20) }}
+                        </h3>
 
-                        <p class="text-gray-300 text-sm line-clamp-3">
-                            {{ Str::limit($course->description, 100) }}
+                        <p class="text-xs text-gray-700 mb-3 text-center leading-snug px-1" style="height: 2.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ $course->description }}
                         </p>
 
-                        <!-- Stats -->
-                        <div class="flex items-center justify-between text-sm text-gray-300">
-                            <div class="flex items-center space-x-4">
-                                <!-- Modules -->
-                                <span class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
-                                    </svg>
-                                    {{ $course->modules->count() }} Modules
-                                </span>
-
-                                <!-- Students -->
-                                <span class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                                    </svg>
-                                    {{ $course->enrolledStudentsCount() }} Students
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="flex space-x-3">
-                            <a href="{{ route('courses') }}" class="flex-1 px-4 py-2 bg-white text-primary text-center rounded-lg hover:bg-gray-100 transition text-sm font-medium">
-                                Live Demo
-                            </a>
-                            <a href="{{ route('courses') }}" class="flex-1 px-4 py-2 bg-orange text-white text-center rounded-lg hover:bg-orange-light transition text-sm font-medium">
+                        <div class="flex items-center justify-center gap-2 mb-3">
+                            <button class="flex items-center px-3 py-1.5 bg-white border border-orange-300 text-orange-600 rounded-md text-xs font-medium hover:bg-orange-50 transition">
+                                Demo
+                            </button>
+                            <button class="flex items-center px-3 py-1.5 bg-white border border-orange-300 text-orange-600 rounded-md text-xs font-medium hover:bg-orange-50 transition">
                                 Enroll Now
-                            </a>
+                            </button>
                         </div>
 
-                        <!-- Download Curriculum Badge -->
-                        <div class="pt-2">
-                            <span class="inline-flex items-center px-3 py-1.5 bg-orange text-white text-xs font-medium rounded-full">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                </svg>
-                                Download Curriculum
-                            </span>
-                        </div>
+                        <span class="w-full flex items-center justify-center px-3 py-2 bg-orange-500 group-hover:bg-orange-600 text-white rounded-full font-semibold transition text-xs shadow-md">
+                            View Details
+                        </span>
                     </div>
-                </div>
+                </a>
             @empty
                 <div class="col-span-4 text-center py-12">
                     <p class="text-gray-500">No courses available at the moment.</p>
@@ -480,7 +487,7 @@
 
         <!-- View All Button -->
         <div class="text-center">
-            <a href="{{ route('courses') }}" class="inline-block px-8 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition">
+            <a href="{{ route('courses.index') }}" class="inline-block px-8 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition">
                 View All Courses
             </a>
         </div>
@@ -490,8 +497,8 @@
 {{-- ========================================
     ACHIEVEMENTS SECTION
 ========================================= --}}
-<section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="py-16 bg-gradient-to-br from-gray-100 to-gray-50">
+    <div class=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Header -->
         <div class="text-center mb-12">
             <h2 class="text-4xl font-bold">
@@ -499,7 +506,7 @@
             </h2>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class=" grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <!-- Left Illustration -->
             <div class="relative">
                 <img
@@ -652,60 +659,43 @@
 {{-- ========================================
     CERTIFICATIONS SECTION
 ========================================= --}}
-<section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Section Header -->
-        <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold">
-                <span class="text-primary">Our</span> <span class="text-orange">Certifications</span>
-            </h2>
+      <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+        <h2 class="text-4xl font-bold mb-12">
+            <span class="text-primary">Our</span>
+            <span class="text-orange">Certifications</span>
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-10 items-center justify-items-center">
+
+            @foreach($certifications as $cert)
+                <div class="transition duration-300 ease-out ">
+
+                    <div class="w-36 h-36 rounded-full overflow-hidden ">
+
+                        <img
+                            src="{{ asset('storage/' . $cert->image) }}"
+                            alt="{{ $cert->title }}"
+                            class="w-full h-full object-cover rounded-full"
+                        >
+
+                    </div>
+
+                </div>
+            @endforeach
+
         </div>
 
-        <!-- Certifications Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
-            <!-- ISO 27001 -->
-            <div class="text-center hover:scale-110 transition duration-300">
-                <img
-                    src="{{ asset('images/certifications/iso-27001.png') }}"
-                    alt="ISO 27001 Certification"
-                    class="w-32 h-32 mx-auto object-contain"
-                >
-            </div>
-
-            <!-- ISO 9001 -->
-            <div class="text-center hover:scale-110 transition duration-300">
-                <img
-                    src="{{ asset('images/certifications/iso-9001.png') }}"
-                    alt="ISO 9001 Certification"
-                    class="w-32 h-32 mx-auto object-contain"
-                >
-            </div>
-
-            <!-- ISO 20000-1 -->
-            <div class="text-center hover:scale-110 transition duration-300">
-                <img
-                    src="{{ asset('images/certifications/iso-20000.png') }}"
-                    alt="ISO 20000-1 Certification"
-                    class="w-32 h-32 mx-auto object-contain"
-                >
-            </div>
-
-            <!-- ISO 29993 -->
-            <div class="text-center hover:scale-110 transition duration-300">
-                <img
-                    src="{{ asset('images/certifications/iso-29993.png') }}"
-                    alt="ISO 29993 Certification"
-                    class="w-32 h-32 mx-auto object-contain"
-                >
-            </div>
-        </div>
     </div>
 </section>
+
+
 
 {{-- ========================================
     COLLABORATIONS SECTION
 ========================================= --}}
-<section class="py-16 bg-gray-50">
+<section class="py-16 ">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Section Header -->
         <div class="text-center mb-12">

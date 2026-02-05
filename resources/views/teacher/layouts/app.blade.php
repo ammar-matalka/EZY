@@ -84,25 +84,9 @@
             <div class="p-6">
                 <!-- Logo -->
                 <div class="mb-8">
-                    <img src="{{ asset('images/logo-white.png') }}" alt="EZY Skills" class="h-12 w-auto">
+                    <img src="{{ asset('images/logo.png') }}" alt="EZY Skills" class="h-12 w-auto">
                 </div>
 
-                <!-- User Info -->
-                <div class="bg-primary-light rounded-lg p-4 mb-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-orange rounded-full flex items-center justify-center">
-                            @if(auth()->user()->avatar)
-                                <img src="{{ Storage::url(auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-full h-full rounded-full object-cover">
-                            @else
-                                <span class="text-white font-bold">{{ substr(auth()->user()->name, 0, 1) }}</span>
-                            @endif
-                        </div>
-                        <div>
-                            <p class="font-semibold text-sm">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-gray-300">Instructor</p>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Navigation -->
                 <nav class="space-y-2">

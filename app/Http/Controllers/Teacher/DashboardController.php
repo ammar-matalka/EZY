@@ -17,15 +17,16 @@ class DashboardController extends Controller
         $teacher = auth()->user();
 
         // Statistics
-        $stats = [
-            'courses' => $teacher->courses()->count(),
-            'opened_courses' => $teacher->courses()->where('status', 'opened')->count(),
-            'students' => Enrollment::whereHas('course', function($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id);
-            })->distinct('student_id')->count('student_id'),
-            'modules' => $teacher->courses()->withCount('modules')->get()->sum('modules_count'),
-            'projects' => $teacher->courses()->withCount('projects')->get()->sum('projects_count'),
-        ];
+       $stats = [
+    'courses' => $teacher->courses()->count(),
+    'opened_courses' => $teacher->courses()->where('status', 'opened')->count(),
+    'students' => Enrollment::whereHas('course', function ($q) use ($teacher) {
+        $q->where('user_id', $teacher->id);
+    })->distinct('user_id')->count('user_id'),
+    'modules' => $teacher->courses()->withCount('modules')->get()->sum('modules_count'),
+    'projects' => $teacher->courses()->withCount('projects')->get()->sum('projects_count'),
+];
+
 
         // Recent Courses (last 5)
         $recentCourses = $teacher->courses()
@@ -36,8 +37,8 @@ class DashboardController extends Controller
 
         // Recent Students (last 10)
         $recentStudents = Enrollment::with(['student', 'course'])
-            ->whereHas('course', function($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id);
+            ->whereHas('course', function ($q) use ($teacher) {
+                $q->where('user_id', $teacher->id);
             })
             ->latest()
             ->take(10)

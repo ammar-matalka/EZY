@@ -30,15 +30,15 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     Teacher <span class="text-red-500">*</span>
                 </label>
-                <select name="teacher_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary @error('teacher_id') border-red-500 @enderror">
+                <select name="user_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary @error('user_id') border-red-500 @enderror">
                     <option value="">Select Teacher</option>
                     @foreach($teachers as $teacher)
-                        <option value="{{ $teacher->id }}" {{ (old('teacher_id', $course->teacher_id) == $teacher->id) ? 'selected' : '' }}>
+                        <option value="{{ $teacher->id }}" {{ (old('user_id', $course->user_id) == $teacher->id) ? 'selected' : '' }}>
                             {{ $teacher->name }} ({{ $teacher->email }})
                         </option>
                     @endforeach
                 </select>
-                @error('teacher_id')
+                @error('user_id')
                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                 @enderror
             </div>

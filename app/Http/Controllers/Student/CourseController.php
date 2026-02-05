@@ -9,89 +9,83 @@ use Illuminate\Http\Request;
 class CourseController extends Controller
 {
     /**
-     * Display a listing of available courses.
+     * Display courses listing
      */
     public function index(Request $request)
     {
-        $query = Course::with('teacher');
+        $query = Course::with(['modules', 'enrollments']);
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
 
         // Filter by status
-        if ($request->has('status') && $request->status != '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
-        } else {
-            // Show only opened courses by default
-            $query->where('status', 'opened');
         }
 
         // Filter by category
-        if ($request->has('category') && $request->category != '') {
+        if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
         // Filter by level
-        if ($request->has('level') && $request->level != '') {
+        if ($request->filled('level')) {
             $query->where('level', $request->level);
         }
 
-        // Search by title
-        if ($request->has('search') && $request->search != '') {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
-
         // Sorting
-        if ($request->has('sort')) {
-            switch ($request->sort) {
-                case 'oldest':
-                    $query->oldest();
-                    break;
-                case 'title':
-                    $query->orderBy('title', 'asc');
-                    break;
-                default:
-                    $query->latest();
-            }
-        } else {
-            $query->latest();
+        switch ($request->get('sort', 'popular')) {
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name':
+                $query->orderBy('title', 'asc');
+                break;
+            case 'popular':
+            default:
+                $query->withCount('enrollments')
+                      ->orderBy('enrollments_count', 'desc');
+                break;
         }
 
         $courses = $query->paginate(12);
 
-        // Get categories for filter
-        $categories = Course::where('status', 'opened')
-            ->distinct()
-            ->pluck('category')
-            ->filter();
-
-        return view('student.courses.index', compact('courses', 'categories'));
+        return view('student.courses.index', compact('courses'));
     }
 
     /**
-     * Display the specified course.
+     * Display course details
      */
     public function show(Course $course)
     {
         // Check if course is opened
-        if (!$course->isOpened()) {
-            abort(404);
+        if ($course->status !== 'opened') {
+            abort(404, 'Course not available');
         }
 
-        $course->load(['teacher', 'modules', 'projects']);
+        // Load relationships
+        $course->load(['modules.lessons', 'projects']);
 
-        // Check if student already enrolled
-        $student = auth()->user();
-        $isEnrolled = $student->enrollments()
-            ->where('course_id', $course->id)
-            ->where('status', 'active')
-            ->exists();
+        // Check if user has access (enrolled or purchased)
+        $hasAccess = false;
 
-        // Check if student can enroll
-        $canEnroll = !$isEnrolled && $student->canEnroll();
-
-        return view('student.courses.show', compact('course', 'isEnrolled', 'canEnroll'));
-{
-    $courses = Course::where('status', 'opened')->latest()->paginate(12);
-    return view('courses', compact('courses'));
-}
+        if (auth()->check()) {
+            $hasAccess = $course->enrollments()
+                ->where('user_id', auth()->id())
+                ->where('status', 'active')
+                ->exists();
         }
-}
 
+        return view('student.courses.show', compact('course', 'hasAccess'));
+    }
+}

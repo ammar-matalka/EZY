@@ -32,7 +32,7 @@
             <div class="hidden lg:flex items-center space-x-8">
                 <a href="/" class="text-gray-700 hover:text-orange-500 transition font-medium">Home</a>
                 <a href="#" class="text-gray-700 hover:text-orange-500 transition font-medium">Course Selector</a>
-                <a href="{{ route('courses') }}" class="text-gray-700 hover:text-orange-500 transition font-medium">Courses</a>
+                <a href="{{ route('courses.index') }}" class="text-gray-700 hover:text-orange-500 transition font-medium">Courses</a>
                 <a href="#" class="text-gray-700 hover:text-orange-500 transition font-medium">Pricing</a>
                 <a href="#" class="text-gray-700 hover:text-orange-500 transition font-medium">FAQ</a>
                 <a href="#" class="text-gray-700 hover:text-orange-500 transition font-medium">Contact US</a>

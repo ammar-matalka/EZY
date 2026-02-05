@@ -19,12 +19,12 @@ class StudentController extends Controller
         $courses = $teacher->courses()->orderBy('title')->get();
 
         // Statistics
-        $allEnrollments = Enrollment::whereHas('course', function($q) use ($teacher) {
-            $q->where('teacher_id', $teacher->id);
+        $allEnrollments = Enrollment::whereHas('course', function ($q) use ($teacher) {
+            $q->where('user_id', $teacher->id);
         });
 
         $stats = [
-            'total' => (clone $allEnrollments)->distinct('student_id')->count('student_id'),
+            'total' => (clone $allEnrollments)->distinct('user_id')->count('user_id'),
             'active' => (clone $allEnrollments)->where('status', 'active')->count(),
             'completed' => (clone $allEnrollments)->where('status', 'completed')->count(),
             'avg_progress' => round((clone $allEnrollments)->avg('progress') ?? 0),
@@ -32,16 +32,16 @@ class StudentController extends Controller
 
         // Query with filters
         $query = Enrollment::with(['student', 'course.modules'])
-            ->whereHas('course', function($q) use ($teacher) {
-                $q->where('teacher_id', $teacher->id);
+            ->whereHas('course', function ($q) use ($teacher) {
+                $q->where('user_id', $teacher->id);
             });
 
         // Filter by student search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('student', function($q) use ($search) {
+            $query->whereHas('student', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 

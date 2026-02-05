@@ -18,7 +18,7 @@ class PaymentController extends Controller
         $subscription = Subscription::findOrFail($subscriptionId);
 
         // Ensure user owns this subscription
-        if ($subscription->student_id !== auth()->id()) {
+        if ($subscription->user_id !== auth()->id()) {
             abort(403);
         }
 

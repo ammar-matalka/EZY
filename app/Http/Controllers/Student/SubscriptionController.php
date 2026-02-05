@@ -4,91 +4,32 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
-use App\Models\Subscription;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
-    /**
-     * Display available plans for selection.
-     */
-    public function choosePlan()
-    {
-        $plans = Plan::where('is_active', true)
-            ->orderBy('price')
-            ->get();
-
-        $student = auth()->user();
-        $currentSubscription = $student->activeSubscription;
-
-        return view('student.plans.choose', compact('plans', 'currentSubscription'));
-    }
-
-    /**
-     * Subscribe to a plan.
-     */
     public function subscribe(Request $request, Plan $plan)
     {
-        $student = auth()->user();
+        $user = auth()->user();
 
-        // Check if already has active subscription
-        if ($student->activeSubscription) {
-            return redirect()->back()
-                ->with('error', 'You already have an active subscription!');
+        if (!$user->isStudent()) {
+            return back()->with('error', 'Only students can subscribe.');
         }
 
-        // Check if plan is active
-        if (!$plan->isActive()) {
-            return redirect()->back()
-                ->with('error', 'This plan is not available!');
+        if ($user->activeSubscription()->exists()) {
+            return back()->with('error', 'You already have an active subscription.');
         }
 
-        // Create subscription
-        $subscription = Subscription::create([
-            'student_id' => $student->id,
-            'plan_id' => $plan->id,
-            'status' => 'active',
-            'started_at' => now(),
-        ]);
+     $user->subscriptions()->create([
+    'plan_id' => $plan->id,
+    'courses_limit' => $plan->courses_limit,
+    'courses_selected' => 0,
+    'status' => 'active',
+    'starts_at' => now(),
+    'expires_at' => now()->addMonth(),
+]);
 
-        // Redirect to payment (will be implemented with Razorpay)
-        return redirect()->route('payment.process', ['subscription' => $subscription->id])
-            ->with('success', 'Please complete your payment!');
-    }
 
-    /**
-     * Upgrade subscription plan.
-     */
-    public function upgrade(Request $request)
-    {
-        $student = auth()->user();
-        $currentSubscription = $student->activeSubscription;
-
-        if (!$currentSubscription) {
-            return redirect()->route('student.plans.choose')
-                ->with('error', 'No active subscription found!');
-        }
-
-        $request->validate([
-            'plan_id' => ['required', 'exists:plans,id'],
-        ]);
-
-        $newPlan = Plan::findOrFail($request->plan_id);
-
-        // Check if new plan is better
-        if ($newPlan->price <= $currentSubscription->plan->price) {
-            return redirect()->back()
-                ->with('error', 'Please select a higher plan!');
-        }
-
-        // Calculate price difference
-        $priceDifference = $newPlan->price - $currentSubscription->plan->price;
-
-        // Redirect to payment for upgrade
-        return redirect()->route('payment.process', [
-            'subscription' => $currentSubscription->id,
-            'upgrade_to' => $newPlan->id,
-            'amount' => $priceDifference
-        ])->with('success', 'Please complete your payment for upgrade!');
+        return redirect()->route('student.dashboard')->with('success', 'Plan activated successfully!');
     }
 }

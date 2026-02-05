@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Traits\HasSubscription;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasSubscription;
+
 
     /**
      * The attributes that are mass assignable.
@@ -59,7 +61,7 @@ class User extends Authenticatable
      */
     public function courses()
     {
-        return $this->hasMany(Course::class, 'teacher_id');
+        return $this->hasMany(Course::class, 'user_id');
     }
 
     /**
@@ -67,7 +69,7 @@ class User extends Authenticatable
      */
     public function subscriptions()
     {
-        return $this->hasMany(Subscription::class, 'student_id');
+        return $this->hasMany(Subscription::class, 'user_id');
     }
 
     /**
@@ -75,7 +77,7 @@ class User extends Authenticatable
      */
     public function activeSubscription()
     {
-        return $this->hasOne(Subscription::class, 'student_id')
+        return $this->hasOne(Subscription::class, 'user_id')
             ->where('status', 'active')
             ->latest();
     }
@@ -85,10 +87,10 @@ class User extends Authenticatable
      */
     public function enrollments()
     {
-        return $this->hasMany(Enrollment::class, 'student_id');
+        return $this->hasMany(Enrollment::class, 'user_id');
     }
 
-  
+
 
     /**
      * Payments made by this user.

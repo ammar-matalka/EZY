@@ -1,331 +1,420 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة الكورسات - EZY Skills</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+@extends('layouts.app')
 
-        * {
-            font-family: 'Cairo', sans-serif;
-        }
+@section('title', 'Courses')
 
-        .course-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+@section('content')
 
-        .course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
+@php
+    $hasSubscription = auth()->check() && auth()->user()->hasActiveSubscription();
+    $subscription = $hasSubscription ? auth()->user()->activeSubscription : null;
+    $selectedCourseIds = $subscription ? $subscription->courses()->pluck('courses.id')->toArray() : [];
+@endphp
 
-        .tab-active {
-            color: #FF6B35;
-            border-bottom: 2px solid #FF6B35;
-        }
-    </style>
-</head>
-<body class="bg-gray-50">
+<!-- Subscription Status Bar (Only for subscribers) -->
+@if($hasSubscription)
+<div class="sticky top-0 z-40 bg-gradient-to-r from-[#003F7D] to-[#0056a8] shadow-lg"
+     x-data="courseSelector({
+         limit: {{ $subscription->courses_limit }},
+         selected: {{ $subscription->courses_selected }},
+         selectedIds: {{ json_encode($selectedCourseIds) }}
+     })">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <!-- Logo -->
-                <div class="flex items-center gap-2">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                        <span class="text-white text-xl font-bold">EZY</span>
+            <!-- Progress Info -->
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                        <span class="text-lg font-bold text-white" x-text="selected"></span>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-800">EZY Skills</h1>
-                        <p class="text-xs text-gray-500">Online Courses</p>
+                    <div class="text-white">
+                        <p class="text-xs text-white/70">Enrolled</p>
+                        <p class="font-semibold text-sm">
+                            <span x-text="selected"></span> / <span x-text="limit"></span> Courses
+                        </p>
                     </div>
                 </div>
 
-                <!-- Menu -->
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="{{ route('home') }}" class="text-gray-600 hover:text-blue-600">Home</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600">Course Selector</a>
-                    <a href="{{ route('student.courses.index') }}" class="text-orange-500 font-semibold">Courses</a>
-                    <a href="{{ route('pricing') }}" class="text-gray-600 hover:text-blue-600">Pricing</a>
-                    <a href="{{ route('faq') }}" class="text-gray-600 hover:text-blue-600">FAQ</a>
-                    <a href="{{ route('contact') }}" class="text-gray-600 hover:text-blue-600">Contact Us</a>
-                </div>
-
-                <!-- Auth Buttons -->
-                <div class="flex items-center gap-4">
-                    @auth
-                        <a href="{{ route('student.dashboard') }}" class="px-6 py-2 text-orange-500 border-2 border-orange-500 rounded-lg hover:bg-orange-50">
-                            Dashboard
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                                Logout
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="px-6 py-2 text-orange-500 border-2 border-orange-500 rounded-lg hover:bg-orange-50">
-                            Log In
-                        </a>
-                        <a href="{{ route('register') }}" class="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600">
-                            Create Account
-                        </a>
-                    @endauth
+                <!-- Progress Bar -->
+                <div class="hidden md:block w-32">
+                    <div class="h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div class="h-full bg-orange-500 rounded-full transition-all duration-300"
+                             :style="`width: ${(selected / limit) * 100}%`"></div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Plan Badge & My Courses Link -->
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 bg-orange-500 text-white text-xs font-bold rounded-full">
+                    {{ $subscription->plan->name }}
+                </span>
+                <a href="{{ route('my-courses') }}" class="text-white/80 hover:text-white text-sm font-medium flex items-center gap-1">
+                    My Courses
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-6 py-12">
+    <!-- Confirmation Modal -->
+    <div x-show="showModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+         @click.self="showModal = false">
 
-        <!-- Page Title -->
-        <h2 class="text-4xl font-bold text-center mb-12">
-            <span class="text-gray-700">Courses</span>
-            <span class="text-orange-500">List</span>
-        </h2>
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
 
-        <!-- Search & Filters -->
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+            <!-- Warning Icon -->
+            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
 
-            <!-- Search Box -->
-            <div class="w-full md:w-1/3">
-                <form method="GET" action="{{ route('student.courses.index') }}">
-                    <div class="relative">
-                        <input
-                            type="text"
-                            name="search"
-                            value="{{ request('search') }}"
-                            placeholder="Search The Course Here..."
-                            class="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        >
-                        <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                            <i class="fas fa-search"></i>
-                        </button>
+            <h3 class="text-xl font-bold text-gray-900 text-center mb-2">Confirm Enrollment</h3>
+
+            <p class="text-gray-600 text-center mb-2">Are you sure you want to enroll in:</p>
+            <p class="text-lg font-bold text-[#003F7D] text-center mb-4" x-text="selectedCourseName"></p>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
+                <p class="text-amber-700 text-sm text-center">
+                    ⚠️ <strong>Warning:</strong> This action cannot be undone.
+                </p>
+            </div>
+
+            <div class="flex gap-3">
+                <button @click="showModal = false"
+                        class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
+                    Cancel
+                </button>
+                <button @click="confirmEnroll()"
+                        :disabled="loading"
+                        class="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all disabled:opacity-50">
+                    <span x-show="!loading">Yes, Enroll</span>
+                    <span x-show="loading">
+                        <svg class="animate-spin h-5 w-5 inline" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div x-show="toast.show"
+         x-transition
+         class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50"
+         :class="toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'">
+        <p x-text="toast.message"></p>
+    </div>
+</div>
+@endif
+
+<!-- Search & Filters Section -->
+<div class="bg-white py-8 border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+
+            <!-- Search Bar -->
+            <div class="w-full md:w-80">
+                <form method="GET" action="{{ route('courses.index') }}">
+                    <div class="relative rounded-xl bg-gray-100">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                               placeholder="Search The Course Here"
+                               class="w-full pl-10 pr-4 py-2.5 bg-transparent rounded-xl text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-0 text-sm">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
                     </div>
                 </form>
             </div>
 
             <!-- Status Tabs -->
-            <div class="flex items-center gap-8">
-                <a href="{{ route('student.courses.index') }}"
-                   class="text-gray-600 hover:text-orange-500 pb-2 {{ !request('status') ? 'tab-active' : '' }}">
+            <div class="flex space-x-8 border-b-2 border-transparent">
+                <a href="{{ route('courses.index') }}"
+                   class="pb-2 font-medium text-sm {{ !request('status') ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-700' }}">
                     All
                 </a>
-                <a href="{{ route('student.courses.index', ['status' => 'opened']) }}"
-                   class="text-gray-600 hover:text-orange-500 pb-2 {{ request('status') == 'opened' ? 'tab-active' : '' }}">
+                <a href="{{ route('courses.index', ['status' => 'opened']) }}"
+                   class="pb-2 font-medium text-sm {{ request('status') == 'opened' ? 'text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-700' }}">
                     Opened
                 </a>
-                <a href="{{ route('student.courses.index', ['status' => 'coming_soon']) }}"
-                   class="text-gray-600 hover:text-orange-500 pb-2 {{ request('status') == 'coming_soon' ? 'tab-active' : '' }}">
+                <a href="{{ route('courses.index', ['status' => 'coming_soon']) }}"
+                   class="pb-2 font-medium text-sm {{ request('status') == 'coming_soon' ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-700' }}">
                     Coming Soon
                 </a>
-                <a href="{{ route('student.courses.index', ['status' => 'archived']) }}"
-                   class="text-gray-600 hover:text-orange-500 pb-2 {{ request('status') == 'archived' ? 'tab-active' : '' }}">
+                <a href="{{ route('courses.index', ['status' => 'archived']) }}"
+                   class="pb-2 font-medium text-sm {{ request('status') == 'archived' ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-700' }}">
                     Archived
                 </a>
             </div>
 
             <!-- Sort Dropdown -->
             <div class="w-full md:w-auto">
-                <form method="GET" action="{{ route('student.courses.index') }}" id="sortForm">
-                    <select
-                        name="sort"
-                        onchange="document.getElementById('sortForm').submit()"
-                        class="px-6 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                        <option value="latest">Sort by: Popular Class</option>
-                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest</option>
-                        <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Title A-Z</option>
+                <form method="GET" action="{{ route('courses.index') }}" id="sortForm">
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <select name="sort" onchange="document.getElementById('sortForm').submit()"
+                            class="w-full md:w-48 px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-700 text-sm focus:outline-none focus:border-gray-400 cursor-pointer">
+                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Sort by: Popular Class</option>
+                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Sort by: Newest</option>
+                        <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Sort by: Oldest</option>
+                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Sort by: Name A-Z</option>
                     </select>
                 </form>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Courses Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            @forelse($courses as $course)
-                <div class="course-card bg-white rounded-2xl overflow-hidden shadow-md">
+<!-- Courses Grid Section -->
+<div class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                    <!-- Course Image with Icon -->
-                    <div class="relative bg-gradient-to-br from-blue-700 to-blue-900 h-48 flex items-center justify-center">
-                        @php
-                            // Map course categories to icons and colors
-                            $courseIcons = [
-                                'angular' => ['icon' => 'fab fa-angular', 'color' => 'text-red-600', 'bg' => 'bg-white'],
-                                'aws' => ['icon' => 'fab fa-aws', 'color' => 'text-orange-400', 'bg' => 'bg-gray-900'],
-                                'vue' => ['icon' => 'fab fa-vuejs', 'color' => 'text-green-500', 'bg' => 'bg-gray-900'],
-                                'python' => ['icon' => 'fab fa-python', 'color' => 'text-blue-500', 'bg' => 'bg-white'],
-                                'react' => ['icon' => 'fab fa-react', 'color' => 'text-blue-400', 'bg' => 'bg-gray-900'],
-                                'default' => ['icon' => 'fas fa-graduation-cap', 'color' => 'text-white', 'bg' => 'bg-blue-600']
-                            ];
+        @if($courses->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                 x-data="{ show: false }"
+                 x-init="setTimeout(() => show = true, 100)">
 
-                            $icon = $courseIcons[strtolower($course->category)] ?? $courseIcons['default'];
-                        @endphp
+                @foreach($courses as $index => $course)
+                    <div x-show="show"
+                         x-transition:enter="transition ease-out duration-500"
+                         x-transition:enter-start="opacity-0 translate-y-5"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         style="transition-delay: {{ $index * 50 }}ms;">
 
-                        <div class="w-32 h-32 {{ $icon['bg'] }} rounded-2xl flex items-center justify-center">
-                            <i class="{{ $icon['icon'] }} text-6xl {{ $icon['color'] }}"></i>
+                        <div class="block relative pb-40 group">
+
+                            <!-- Blue Background Section -->
+                            <div class="h-72 bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl relative transition-transform group-hover:scale-105 duration-300"
+                                 @if($hasSubscription)
+                                 :class="{ 'ring-4 ring-green-500': isEnrolled({{ $course->id }}) }"
+                                 @endif>
+
+                                <!-- Course Image/Logo -->
+                                <div class="absolute top-6 left-1/2 transform -translate-x-1/2" style="width: 120px; height: 120px;">
+                                    @if($course->image)
+                                        <img src="{{ Storage::url($course->image) }}" alt="{{ $course->title }}" class="w-full h-full object-contain">
+                                    @else
+                                        <div class="text-cyan-300 text-6xl font-bold text-center">
+                                            {{ substr($course->title, 0, 1) }}
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Enrolled Badge -->
+                                @if($hasSubscription)
+                                <div x-show="isEnrolled({{ $course->id }})"
+                                     class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Enrolled
+                                </div>
+                                @endif
+                            </div>
+
+                            <!-- White Overlapping Card -->
+                            <div class="absolute left-4 right-4 bg-white rounded-xl shadow-lg p-4 group-hover:shadow-2xl transition-shadow" style="top: 11rem;">
+
+                                <h3 class="text-lg font-black text-gray-900 mb-2 text-center group-hover:text-orange-500 transition-colors">
+                                    {{ Str::limit($course->title, 20) }}
+                                </h3>
+
+                                <p class="text-xs text-gray-700 mb-3 text-center leading-snug px-1" style="height: 2.5rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                    {{ $course->description }}
+                                </p>
+
+                                <!-- Action Buttons Based on User State -->
+                                <div class="flex flex-col gap-2">
+
+                                    @guest
+                                        <!-- Not Logged In -->
+                                        <a href="{{ route('login') }}"
+                                           class="w-full flex items-center justify-center px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-semibold transition text-xs shadow-md">
+                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                            </svg>
+                                            Login to Enroll
+                                        </a>
+                                    @else
+                                        @if($hasSubscription)
+                                            <!-- Has Subscription -->
+                                            <template x-if="isEnrolled({{ $course->id }})">
+                                                <a href="{{ route('courses.show', $course) }}"
+                                                   class="w-full flex items-center justify-center px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full font-semibold transition text-xs shadow-md">
+                                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    Start Learning
+                                                </a>
+                                            </template>
+
+                                            <template x-if="!isEnrolled({{ $course->id }})">
+                                                <button @click="openModal({{ $course->id }}, '{{ addslashes($course->title) }}')"
+                                                        :disabled="remaining === 0"
+                                                        class="w-full flex items-center justify-center px-3 py-2 rounded-full font-semibold transition text-xs shadow-md"
+                                                        :class="remaining === 0
+                                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                            : 'bg-orange-500 hover:bg-orange-600 text-white'">
+                                                    <span x-show="remaining > 0">
+                                                        <svg class="w-4 h-4 mr-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                        </svg>
+                                                        Enroll Now
+                                                    </span>
+                                                    <span x-show="remaining === 0">🔒 Limit Reached</span>
+                                                </button>
+                                            </template>
+                                        @else
+                                            <!-- No Subscription -->
+                                            <a href="{{ route('pricing') }}"
+                                               class="w-full flex items-center justify-center px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-semibold transition text-xs shadow-md">
+                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                                </svg>
+                                                Subscribe to Enroll
+                                            </a>
+                                        @endif
+                                    @endguest
+
+                                    <!-- View Details (Always visible) -->
+                                    <a href="{{ route('courses.show', $course) }}"
+                                       class="w-full flex items-center justify-center px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-semibold transition text-xs">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                @endforeach
+            </div>
+        @else
+            <!-- Empty State -->
+            <div class="flex flex-col items-center justify-center py-24 text-center"
+                 x-data="{ show: false }"
+                 x-init="setTimeout(() => show = true, 100)"
+                 x-show="show"
+                 x-transition>
 
-                    <!-- Course Info -->
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-3 text-center">{{ $course->title }}</h3>
-                        <p class="text-sm text-gray-600 mb-4 text-center h-12 overflow-hidden">
-                            {{ Str::limit($course->description, 80) }}
-                        </p>
-
-                        <!-- Course Stats -->
-                        <div class="flex items-center justify-center gap-6 mb-4">
-                            <div class="flex items-center gap-1 text-gray-600 text-sm">
-                                <i class="far fa-clock text-orange-500"></i>
-                                <span>{{ $course->duration }} Hours</span>
-                            </div>
-                            <div class="flex items-center gap-1 text-gray-600 text-sm">
-                                <i class="far fa-user text-orange-500"></i>
-                                <span>Good Start</span>
-                            </div>
-                        </div>
-
-                        <!-- Enroll Button -->
-                        @if($course->status === 'opened')
-                            <a href="{{ route('student.courses.show', $course->slug) }}"
-                               class="block w-full py-3 bg-orange-500 text-white text-center rounded-full hover:bg-orange-600 transition">
-                                <i class="fas fa-download mr-2"></i>
-                                Download Certificate
-                            </a>
-                        @elseif($course->status === 'coming_soon')
-                            <button disabled class="block w-full py-3 bg-gray-300 text-gray-500 text-center rounded-full cursor-not-allowed">
-                                <i class="fas fa-clock mr-2"></i>
-                                Coming Soon
-                            </button>
-                        @else
-                            <button disabled class="block w-full py-3 bg-gray-300 text-gray-500 text-center rounded-full cursor-not-allowed">
-                                <i class="fas fa-archive mr-2"></i>
-                                Archived
-                            </button>
-                        @endif
-                    </div>
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                    </svg>
                 </div>
-            @empty
-                <div class="col-span-full text-center py-12">
-                    <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
-                    <p class="text-gray-500 text-lg">No courses found</p>
-                </div>
-            @endforelse
-        </div>
+
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">No Courses Found</h3>
+                <p class="text-gray-500 max-w-md mx-auto mb-8">
+                    We couldn't find any courses matching your filters.
+                </p>
+
+                <a href="{{ route('courses.index') }}" class="inline-flex items-center px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition shadow-md">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Reset Filters
+                </a>
+            </div>
+        @endif
 
         <!-- Pagination -->
-        <div class="flex justify-center items-center gap-2">
-            {{ $courses->links('pagination::tailwind') }}
-        </div>
+        @if($courses->hasPages())
+            <div class="mt-12 flex justify-center">
+                {{ $courses->links() }}
+            </div>
+        @endif
+
     </div>
+</div>
 
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 mt-20">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+@endsection
 
-                <!-- Logo & Description -->
-                <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
-                            <span class="text-blue-800 text-xl font-bold">EZY</span>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold">EZY Skills</h3>
-                            <p class="text-xs text-blue-200">Online Courses</p>
-                        </div>
-                    </div>
-                    <p class="text-blue-200 mb-6">
-                        Let Us build your career together! Be the first person to transform yourself with our unique & world class corporate level trainings.
-                    </p>
+@if($hasSubscription)
+@push('scripts')
+<script>
+function courseSelector(config) {
+    return {
+        limit: config.limit,
+        selected: config.selected,
+        selectedIds: config.selectedIds,
+        loading: false,
+        showModal: false,
+        pendingCourseId: null,
+        selectedCourseName: '',
+        toast: { show: false, message: '', type: 'success' },
 
-                    <!-- Newsletter -->
-                    <div>
-                        <h4 class="font-semibold mb-3">Subscribe Our Newsletter</h4>
-                        <div class="flex gap-2">
-                            <input
-                                type="email"
-                                placeholder="Your Email address..."
-                                class="flex-1 px-4 py-2 rounded-lg text-gray-800 focus:outline-none"
-                            >
-                            <button class="px-6 py-2 bg-orange-500 rounded-lg hover:bg-orange-600">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        get remaining() {
+            return Math.max(0, this.limit - this.selected);
+        },
 
-                <!-- Quick Links -->
-                <div>
-                    <h4 class="font-bold text-lg mb-6">Quick <span class="text-orange-400">Links</span></h4>
-                    <ul class="space-y-3">
-                        <li><a href="{{ route('home') }}" class="text-blue-200 hover:text-white">Home</a></li>
-                        <li><a href="#" class="text-blue-200 hover:text-white">Our Story</a></li>
-                        <li><a href="#" class="text-blue-200 hover:text-white">Best Courses</a></li>
-                        <li><a href="{{ route('faq') }}" class="text-blue-200 hover:text-white">Why FAQs</a></li>
-                        <li><a href="#" class="text-blue-200 hover:text-white">Cancellation & Refunds</a></li>
-                        <li><a href="{{ route('contact') }}" class="text-blue-200 hover:text-white">Contact Us</a></li>
-                    </ul>
-                </div>
+        isEnrolled(courseId) {
+            return this.selectedIds.includes(courseId);
+        },
 
-                <!-- Contact Us -->
-                <div>
-                    <h4 class="font-bold text-lg mb-6">Contact <span class="text-orange-400">Us</span></h4>
-                    <ul class="space-y-4">
-                        <li class="flex items-start gap-3">
-                            <i class="fas fa-map-marker-alt text-orange-400 mt-1"></i>
-                            <span class="text-blue-200">Nowakethon Complex, 5th floor, 905, A&P opp. Clock Tower, SG Road, Secundrabad, Telangana 500003</span>
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <i class="fas fa-envelope text-orange-400"></i>
-                            <span class="text-blue-200">info@ezyskills.in</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fas fa-phone text-orange-400 mt-1"></i>
-                            <div>
-                                <p class="text-blue-200">+91 8328448903</p>
-                                <p class="text-blue-200">+91 9475484889</p>
-                            </div>
-                        </li>
-                    </ul>
+        openModal(courseId, courseName) {
+            if (this.remaining === 0) {
+                this.showToast('You have reached your course limit!', 'error');
+                return;
+            }
+            this.pendingCourseId = courseId;
+            this.selectedCourseName = courseName;
+            this.showModal = true;
+        },
 
-                    <!-- Social Media -->
-                    <div class="flex gap-4 mt-6">
-                        <a href="#" class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center hover:bg-blue-600">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center hover:bg-blue-600">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center hover:bg-blue-600">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center hover:bg-blue-600">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center hover:bg-blue-600">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        async confirmEnroll() {
+            if (this.loading || !this.pendingCourseId) return;
+            this.loading = true;
 
-            <!-- Footer Bottom -->
-            <div class="border-t border-blue-700 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-blue-200 text-sm">© 2025 EZY Skills. All rights reserved.</p>
-                <div class="flex gap-6 text-sm">
-                    <a href="#" class="text-blue-200 hover:text-white">Terms & Conditions</a>
-                    <a href="#" class="text-blue-200 hover:text-white">Privacy Policy</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+            try {
+                const response = await fetch(`/subscription/add-course/${this.pendingCourseId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                });
 
-</body>
-</html>
+                const data = await response.json();
+
+                if (data.success) {
+                    this.selectedIds.push(this.pendingCourseId);
+                    this.selected = data.selected;
+                    this.showModal = false;
+                    this.showToast('🎉 ' + data.message, 'success');
+
+                    // Reload to update UI
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    this.showToast(data.message, 'error');
+                }
+            } catch (error) {
+                this.showToast('Something went wrong. Please try again.', 'error');
+            } finally {
+                this.loading = false;
+                this.pendingCourseId = null;
+            }
+        },
+
+        showToast(message, type = 'success') {
+            this.toast = { show: true, message, type };
+            setTimeout(() => this.toast.show = false, 3000);
+        }
+    }
+}
+</script>
+@endpush
+@endif

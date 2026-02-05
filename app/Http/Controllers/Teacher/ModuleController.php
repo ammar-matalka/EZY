@@ -15,7 +15,7 @@ class ModuleController extends Controller
     public function create(Course $course)
     {
         // Check if teacher owns this course
-        if ($course->teacher_id !== auth()->id()) {
+        if ($course->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -28,7 +28,7 @@ class ModuleController extends Controller
     public function store(Request $request, Course $course)
     {
         // Check if teacher owns this course
-        if ($course->teacher_id !== auth()->id()) {
+        if ($course->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -60,7 +60,7 @@ class ModuleController extends Controller
     public function edit(Course $course, Module $module)
     {
         // Check if teacher owns this course
-        if ($course->teacher_id !== auth()->id()) {
+        if ($course->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -73,7 +73,7 @@ class ModuleController extends Controller
     public function update(Request $request, Course $course, Module $module)
     {
         // Check if teacher owns this course
-        if ($course->teacher_id !== auth()->id()) {
+        if ($course->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -105,7 +105,7 @@ class ModuleController extends Controller
     public function destroy(Course $course, Module $module)
     {
         // Check if teacher owns this course
-        if ($course->teacher_id !== auth()->id()) {
+        if ($course->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
         }
 

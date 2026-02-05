@@ -38,8 +38,8 @@ class CourseController extends Controller
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'level' => ['required', 'in:beginner,intermediate,advanced'],
+            // 'category' => ['nullable', 'string', 'max:255'],
+            // 'level' => ['required', 'in:beginner,intermediate,advanced'],
             'duration' => ['nullable', 'integer', 'min:1'],
             'status' => ['required', 'in:opened,coming_soon,archived'],
             'image' => ['nullable', 'image', 'max:2048'],
@@ -56,8 +56,8 @@ class CourseController extends Controller
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'description' => $request->description,
-            'category' => $request->category,
-            'level' => $request->level,
+            // 'category' => $request->category,
+            // 'level' => $request->level,
             'duration' => $request->duration,
             'status' => $request->status,
             'image' => $imagePath,
@@ -73,7 +73,7 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         $course->load(['modules', 'projects', 'enrollments.student']);
 
@@ -86,7 +86,7 @@ class CourseController extends Controller
     public function edit(Course $course)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         return view('teacher.courses.edit', compact('course'));
     }
@@ -97,13 +97,13 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'category' => ['nullable', 'string', 'max:255'],
-            'level' => ['required', 'in:beginner,intermediate,advanced'],
+            // 'category' => ['nullable', 'string', 'max:255'],
+            // 'level' => ['required', 'in:beginner,intermediate,advanced'],
             'duration' => ['nullable', 'integer', 'min:1'],
             'status' => ['required', 'in:opened,coming_soon,archived'],
             'image' => ['nullable', 'image', 'max:2048'],
@@ -123,8 +123,8 @@ class CourseController extends Controller
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'description' => $request->description,
-            'category' => $request->category,
-            'level' => $request->level,
+            // 'category' => $request->category,
+            // 'level' => $request->level,
             'duration' => $request->duration,
             'status' => $request->status,
         ]);
@@ -139,7 +139,7 @@ class CourseController extends Controller
     public function destroy(Course $course)
     {
         // Ensure teacher owns this course
-        if ($course->teacher_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
+        if ($course->user_id !== auth()->id()) { abort(403, 'Unauthorized action.'); }
 
         // Delete image if exists
         if ($course->image) {

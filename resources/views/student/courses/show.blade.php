@@ -1,154 +1,219 @@
-@extends('components.student-layout')
+@extends('layouts.app')
 
 @section('title', $course->title)
-@section('page-title', 'Course Details')
 
 @section('content')
 
-<div class="max-w-6xl mx-auto">
+<!-- Course Hero Section -->
+<div class="relative bg-gradient-to-br from-blue-900 to-blue-800 py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row items-center gap-8"
+             x-data="{ show: false }"
+             x-init="setTimeout(() => show = true, 100)"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-500"
+             x-transition:enter-start="opacity-0 translate-y-5"
+             x-transition:enter-end="opacity-100 translate-y-0">
 
-    <!-- Course Header -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2">
-
-            <!-- Course Image -->
-            <div class="h-96 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+            <!-- Course Logo -->
+            <div class="flex-shrink-0">
                 @if($course->image)
-                    <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                    <img src="{{ Storage::url($course->image) }}" alt="{{ $course->title }}" class="w-32 h-32 md:w-40 md:h-40 object-contain bg-white rounded-2xl p-4 shadow-xl">
                 @else
-                    <svg class="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
+                    <div class="w-32 h-32 md:w-40 md:h-40 bg-white rounded-2xl flex items-center justify-center shadow-xl">
+                        <span class="text-6xl font-bold text-blue-800">{{ substr($course->title, 0, 1) }}</span>
+                    </div>
                 @endif
             </div>
 
             <!-- Course Info -->
-            <div class="p-8">
-
-                <!-- Category & Level -->
-                <div class="flex items-center gap-2 mb-4">
-                    @if($course->category)
-                        <span class="bg-blue-100 text-blue-800 text-sm px-4 py-1 rounded-full font-semibold">{{ $course->category }}</span>
-                    @endif
-                    <span class="bg-gray-100 text-gray-800 text-sm px-4 py-1 rounded-full">{{ ucfirst($course->level) }}</span>
-                </div>
-
-                <!-- Title -->
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ $course->title }}</h1>
-
-                <!-- Teacher -->
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                        {{ substr($course->teacher->name, 0, 1) }}
-                    </div>
-                    <div class="ml-3">
-                        <p class="font-semibold text-gray-800">{{ $course->teacher->name }}</p>
-                        @if($course->teacher->expertise)
-                            <p class="text-sm text-gray-600">{{ $course->teacher->expertise }}</p>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Stats -->
-                <div class="flex items-center gap-6 mb-6 text-gray-600">
-                    @if($course->duration)
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            {{ $course->duration }} hours
-                        </div>
-                    @endif
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            <div class="flex-1 text-center md:text-left">
+                <h1 class="text-4xl md:text-5xl font-black text-white mb-3">
+                    {{ $course->title }}
+                </h1>
+                <p class="text-lg text-white/90 mb-4">
+                    {{ $course->description }}
+                </p>
+                <div class="flex items-center justify-center md:justify-start gap-4 text-white/80">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        {{ $course->enrollments_count ?? 0 }} students
+                        <span>{{ $course->instructor_name ?? 'Expert Instructor' }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>{{ $course->duration ?? '40 Hours' }}</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- Enroll Button -->
-                @if($isEnrolled)
-                    <a href="{{ route('student.my-courses') }}" class="inline-block w-full text-center px-8 py-4 bg-green-600 text-white rounded-lg font-semibold">
-                        ✓ Enrolled - Go to My Courses
-                    </a>
-                @elseif($canEnroll)
-                    <form action="{{ route('student.enroll', $course) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="w-full px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-lg">
-                            Enroll Now
-                        </button>
-                    </form>
-                @else
-                    <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-6 py-4 rounded-lg">
-                        <p class="font-semibold mb-2">⚠️ Enrollment Limit Reached</p>
-                        <p class="text-sm">You've reached your plan limit. Please upgrade your subscription to enroll in more courses.</p>
-                        <a href="{{ route('student.plans.choose') }}" class="inline-block mt-3 text-blue-600 hover:text-blue-800 font-semibold">
-                            Upgrade Plan →
-                        </a>
-                    </div>
-                @endif
-
+            <!-- Price Badge -->
+            <div class="flex-shrink-0 bg-white rounded-2xl p-6 shadow-xl text-center">
+                <div class="text-sm text-gray-600 mb-1">Price</div>
+                <div class="text-4xl font-black text-orange-500">${{ number_format($course->price) }}</div>
+                <div class="text-xs text-gray-500 mt-1">+ Tax</div>
             </div>
         </div>
     </div>
-
-    <!-- Description -->
-    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Course Description</h2>
-        <p class="text-gray-700 leading-relaxed">{{ $course->description }}</p>
-    </div>
-
-    <!-- Modules -->
-    @if($course->modules->count() > 0)
-    <div class="bg-white rounded-lg shadow-md p-8 mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Course Content</h2>
-        <div class="space-y-4">
-            @foreach($course->modules as $module)
-            <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 transition">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold mr-4">
-                            {{ $module->order }}
-                        </div>
-                        <div>
-                            <h3 class="font-semibold text-gray-800">{{ $module->title }}</h3>
-                            @if($module->description)
-                                <p class="text-sm text-gray-600 mt-1">{{ $module->description }}</p>
-                            @endif
-                        </div>
-                    </div>
-                    @if($module->duration)
-                        <span class="text-sm text-gray-500">{{ $module->formatted_duration }}</span>
-                    @endif
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    <!-- Projects -->
-    @if($course->projects->count() > 0)
-    <div class="bg-white rounded-lg shadow-md p-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Course Projects</h2>
-        <div class="space-y-4">
-            @foreach($course->projects as $project)
-            <div class="border border-gray-200 rounded-lg p-6">
-                <h3 class="font-bold text-gray-800 text-lg mb-2">{{ $project->title }}</h3>
-                <p class="text-gray-700 mb-3">{{ $project->description }}</p>
-                @if($project->requirements)
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <p class="text-sm font-semibold text-blue-800 mb-2">Requirements:</p>
-                        <p class="text-sm text-gray-700">{{ $project->requirements }}</p>
-                    </div>
-                @endif
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
 </div>
+
+@if(!$hasAccess)
+    <!-- Locked Content View -->
+    <div class="max-w-4xl mx-auto px-4 py-20">
+        <div class="bg-white rounded-[40px] p-12 shadow-2xl border border-gray-100 relative overflow-hidden"
+             x-data="{ show: false }"
+             x-init="setTimeout(() => show = true, 200)"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-500"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100">
+
+            <!-- Decorative Background Icon -->
+            <div class="absolute -top-10 -right-10 opacity-[0.03] rotate-12">
+                <svg class="w-80 h-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </div>
+
+            <div class="relative z-10 text-center">
+                <div class="w-20 h-20 bg-orange-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
+                    <svg class="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-4">Content Locked</h2>
+                <p class="text-gray-500 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
+                    This premium course is exclusive. You can unlock it by purchasing it individually for
+                    <span class="text-orange-500 font-bold mx-1">${{ number_format($course->price) }}</span>
+                    or by subscribing to one of our value-packed pricing plans.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    @auth
+                        <button onclick="alert('Payment gateway integration coming soon!')" class="px-10 py-4 bg-orange-500 text-white rounded-2xl font-bold shadow-xl shadow-orange-500/30 hover:shadow-2xl hover:-translate-y-1 transition-all">
+                            Purchase Course
+                        </button>
+                    @else
+                        <a href="{{ route('login') }}" class="px-10 py-4 bg-orange-500 text-white rounded-2xl font-bold shadow-xl shadow-orange-500/30 hover:shadow-2xl hover:-translate-y-1 transition-all">
+                            Login to Purchase
+                        </a>
+                    @endauth
+
+                    <a href="{{ route('pricing') }}" class="px-10 py-4 bg-white text-orange-500 border-2 border-orange-500/20 rounded-2xl font-bold hover:bg-orange-500/5 transition-all">
+                        View Plans
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+@else
+    <!-- Full Course Content View -->
+
+    <!-- About & Objectives Section -->
+    <section class="py-20 max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+            <!-- About Course -->
+            <div class="lg:col-span-5">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">About This Course</h2>
+                <p class="text-gray-600 leading-relaxed mb-8">
+                    {{ $course->description }}
+                </p>
+
+                <!-- Learning Objectives -->
+                @if($course->objectives)
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">What You'll Learn</h3>
+                    <ul class="space-y-3">
+                        @foreach(json_decode($course->objectives) as $objective)
+                            <li class="flex items-start gap-3">
+                                <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span class="text-gray-700">{{ $objective }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+
+            <!-- Curriculum -->
+            <div class="lg:col-span-7">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
+
+                <div class="space-y-4">
+                    @forelse($course->modules as $index => $module)
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <button class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition"
+                                    x-data="{ open: {{ $index === 0 ? 'true' : 'false' }} }"
+                                    @click="open = !open">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold">
+                                        {{ $index + 1 }}
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-gray-900">{{ $module->title }}</h3>
+                                        <p class="text-sm text-gray-500">{{ $module->lessons->count() }} Lessons</p>
+                                    </div>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            <div x-show="open" x-collapse class="px-6 pb-4">
+                                <ul class="space-y-2">
+                                    @foreach($module->lessons as $lesson)
+                                        <li class="flex items-center gap-3 text-gray-600">
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <span class="text-sm">{{ $lesson->title }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-gray-500 text-center py-8">No curriculum available yet.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    @if($course->projects && $course->projects->count() > 0)
+        <section class="py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="text-3xl font-bold text-gray-900 mb-10 text-center">Course Projects</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($course->projects as $project)
+                        <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition">
+                            <h3 class="font-bold text-gray-900 mb-2">{{ $project->title }}</h3>
+                            <p class="text-sm text-gray-600">{{ $project->description }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-center">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-4xl font-bold mb-4">Ready to Start Learning?</h2>
+            <p class="text-xl mb-8 text-white/90">Join thousands of students already enrolled</p>
+            <a href="{{ route('student.dashboard') }}" class="inline-block px-10 py-4 bg-white text-orange-500 rounded-2xl font-bold hover:bg-gray-100 transition">
+                Go to Dashboard
+            </a>
+        </div>
+    </section>
+@endif
 
 @endsection
