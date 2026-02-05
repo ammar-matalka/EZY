@@ -12,14 +12,14 @@
 
 <!-- Subscription Status Bar (Only for subscribers) -->
 @if($hasSubscription)
-<div class="sticky top-0 z-40 bg-gradient-to-r from-[#003F7D] to-[#0056a8] shadow-lg"
-     x-data="courseSelector({
-         limit: {{ $subscription->courses_limit }},
-         selected: {{ $subscription->courses_selected }},
-         selectedIds: {{ json_encode($selectedCourseIds) }}
-     })">
+<div class="sticky top-0 z-40 bg-gradient-to-r from-[#003F7D] to-[#0056a8] shadow-lg">
     <div class="max-w-7xl mx-auto px-4 py-3">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4"
+             x-data="courseSelector({
+                 limit: {{ $subscription->courses_limit }},
+                 selected: {{ $subscription->courses_selected }},
+                 selectedIds: {{ json_encode($selectedCourseIds) }}
+             })">
 
             <!-- Progress Info -->
             <div class="flex items-center gap-4">
@@ -58,65 +58,10 @@
             </div>
         </div>
     </div>
-
-    <!-- Confirmation Modal -->
-    <div x-show="showModal"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-150"
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
-         @click.self="showModal = false">
-
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-
-            <!-- Warning Icon -->
-            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
-            </div>
-
-            <h3 class="text-xl font-bold text-gray-900 text-center mb-2">Confirm Enrollment</h3>
-
-            <p class="text-gray-600 text-center mb-2">Are you sure you want to enroll in:</p>
-            <p class="text-lg font-bold text-[#003F7D] text-center mb-4" x-text="selectedCourseName"></p>
-
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
-                <p class="text-amber-700 text-sm text-center">
-                    ⚠️ <strong>Warning:</strong> This action cannot be undone.
-                </p>
-            </div>
-
-            <div class="flex gap-3">
-                <button @click="showModal = false"
-                        class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
-                    Cancel
-                </button>
-                <button @click="confirmEnroll()"
-                        :disabled="loading"
-                        class="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all disabled:opacity-50">
-                    <span x-show="!loading">Yes, Enroll</span>
-                    <span x-show="loading">
-                        <svg class="animate-spin h-5 w-5 inline" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                        </svg>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div x-show="toast.show"
-         x-transition
-         class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50"
-         :class="toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'">
-        <p x-text="toast.message"></p>
-    </div>
 </div>
 @endif
+
+<!-- Modal and Toast will be at the bottom of the page -->
 
 <!-- Search & Filters Section -->
 <div class="bg-white py-8 border-b">
@@ -176,7 +121,16 @@
 </div>
 
 <!-- Courses Grid Section -->
+@if($hasSubscription)
+<div class="bg-gray-50 py-12"
+     x-data="courseSelector({
+         limit: {{ $subscription->courses_limit }},
+         selected: {{ $subscription->courses_selected }},
+         selectedIds: {{ json_encode($selectedCourseIds) }}
+     })">
+@else
 <div class="bg-gray-50 py-12">
+@endif
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         @if($courses->count() > 0)
@@ -213,7 +167,8 @@
                                 <!-- Enrolled Badge -->
                                 @if($hasSubscription)
                                 <div x-show="isEnrolled({{ $course->id }})"
-                                     class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                     class="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"
+                                     style="display: none;">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                     </svg>
@@ -272,7 +227,7 @@
                                                         </svg>
                                                         Enroll Now
                                                     </span>
-                                                    <span x-show="remaining === 0">🔒 Limit Reached</span>
+                                                    <span x-show="remaining === 0" style="display: none;">🔒 Limit Reached</span>
                                                 </button>
                                             </template>
                                         @else
@@ -338,6 +293,65 @@
         @endif
 
     </div>
+
+    @if($hasSubscription)
+    <!-- Confirmation Modal -->
+    <div x-show="showModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+         @click.self="showModal = false"
+         style="display: none;">
+
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <!-- Warning Icon -->
+            <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 text-center mb-2">Confirm Enrollment</h3>
+            <p class="text-gray-600 text-center mb-2">Are you sure you want to enroll in:</p>
+            <p class="text-lg font-bold text-[#003F7D] text-center mb-4" x-text="selectedCourseName"></p>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-6">
+                <p class="text-amber-700 text-sm text-center">
+                    ⚠️ <strong>Warning:</strong> This action cannot be undone.
+                </p>
+            </div>
+
+            <div class="flex gap-3">
+                <button @click="showModal = false"
+                        class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-all">
+                    Cancel
+                </button>
+                <button @click="confirmEnroll()"
+                        :disabled="loading"
+                        class="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all disabled:opacity-50">
+                    <span x-show="!loading">Yes, Enroll</span>
+                    <span x-show="loading" style="display: none;">
+                        <svg class="animate-spin h-5 w-5 inline" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div x-show="toast.show"
+         x-transition
+         class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50"
+         :class="toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'"
+         style="display: none;">
+        <p x-text="toast.message"></p>
+    </div>
+    @endif
 </div>
 
 @endsection
@@ -349,7 +363,7 @@ function courseSelector(config) {
     return {
         limit: config.limit,
         selected: config.selected,
-        selectedIds: config.selectedIds,
+        selectedIds: [...config.selectedIds],
         loading: false,
         showModal: false,
         pendingCourseId: null,
@@ -361,7 +375,9 @@ function courseSelector(config) {
         },
 
         isEnrolled(courseId) {
-            return this.selectedIds.includes(courseId);
+            const enrolled = this.selectedIds.includes(courseId);
+            console.log('Checking enrollment for course:', courseId, 'Result:', enrolled, 'Array:', this.selectedIds);
+            return enrolled;
         },
 
         openModal(courseId, courseName) {
@@ -391,21 +407,39 @@ function courseSelector(config) {
                 const data = await response.json();
 
                 if (data.success) {
-                    this.selectedIds.push(this.pendingCourseId);
+                    // Add course ID to enrolled list
+                    const courseId = this.pendingCourseId;
+
+                    if (!this.selectedIds.includes(courseId)) {
+                        this.selectedIds.push(courseId);
+                    }
+
+                    // Update count
                     this.selected = data.selected;
+
+                    // Close modal
                     this.showModal = false;
+
+                    // Show success
                     this.showToast('🎉 ' + data.message, 'success');
 
-                    // Reload to update UI
-                    setTimeout(() => location.reload(), 1500);
+                    // Force Alpine to update by triggering reactivity
+                    this.$nextTick(() => {
+                        // Create a new array reference to trigger Alpine reactivity
+                        this.selectedIds = [...this.selectedIds];
+                        console.log('Updated selectedIds:', this.selectedIds);
+                    });
+
+                    // Clear pending
+                    this.pendingCourseId = null;
                 } else {
                     this.showToast(data.message, 'error');
                 }
             } catch (error) {
+                console.error('Enrollment error:', error);
                 this.showToast('Something went wrong. Please try again.', 'error');
             } finally {
                 this.loading = false;
-                this.pendingCourseId = null;
             }
         },
 

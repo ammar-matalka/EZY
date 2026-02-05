@@ -95,8 +95,10 @@ class SubscriptionController extends Controller
     }
 
     // Add course to subscription (AJAX) - Cannot be removed once added
-    public function addCourse(Request $request, Course $course)
-    {
+    // Add course (AJAX)
+public function addCourse(Request $request, $id)
+{
+    try {
         $user = auth()->user();
         $subscription = $user->activeSubscription;
 
@@ -107,7 +109,16 @@ class SubscriptionController extends Controller
             ], 403);
         }
 
-        // Check if course is already selected
+        // Find the course manually
+        $course = \App\Models\Course::find($id);
+
+        if (!$course) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Course not found.'
+            ], 404);
+        }
+
         if ($subscription->hasCourse($course->id)) {
             return response()->json([
                 'success' => false,
@@ -115,7 +126,6 @@ class SubscriptionController extends Controller
             ], 400);
         }
 
-        // Check if can add more
         if (!$subscription->canSelectMore()) {
             return response()->json([
                 'success' => false,
@@ -123,7 +133,6 @@ class SubscriptionController extends Controller
             ], 403);
         }
 
-        // Add course (permanent - cannot be removed)
         $subscription->courses()->attach($course->id, ['enrolled_at' => now()]);
         $subscription->increment('courses_selected');
 
@@ -131,9 +140,16 @@ class SubscriptionController extends Controller
             'success' => true,
             'remaining' => $subscription->fresh()->remainingSlots(),
             'selected' => $subscription->fresh()->courses_selected,
-            'message' => 'Course added successfully! This selection is permanent.'
+            'message' => 'Course added successfully!'
         ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error: ' . $e->getMessage()
+        ], 500);
     }
+}
 
     // Confirm course selection
     public function confirmSelection()

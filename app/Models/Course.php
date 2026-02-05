@@ -16,15 +16,16 @@ class Course extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_id',
-        'title',
-        'slug',
-        'description',
-        'image',
-        'category',
-        'level',
-        'duration',
-        'status',
+       'user_id',
+    'title',
+    'subtitle',
+    'slug',
+    'description',
+    'objectives', // JSON column
+    'duration',
+    'status',
+    'image',
+    'price',
     ];
 
     /**

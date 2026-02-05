@@ -66,26 +66,26 @@ class CourseController extends Controller
     /**
      * Display course details
      */
-    public function show(Course $course)
-    {
-        // Check if course is opened
-        if ($course->status !== 'opened') {
-            abort(404, 'Course not available');
-        }
+   /**
+ * Display course details
+ */
+public function show(Course $course)
+{
+    // Load relationships
+    $course->load(['modules.lessons', 'projects']);
 
-        // Load relationships
-        $course->load(['modules.lessons', 'projects']);
+    // Check if user has access (enrolled or subscribed)
+    $hasAccess = false;
 
-        // Check if user has access (enrolled or purchased)
-        $hasAccess = false;
-
-        if (auth()->check()) {
-            $hasAccess = $course->enrollments()
-                ->where('user_id', auth()->id())
-                ->where('status', 'active')
-                ->exists();
-        }
-
-        return view('student.courses.show', compact('course', 'hasAccess'));
+    if (auth()->check()) {
+        // Check if user is enrolled via subscription
+        $hasAccess = auth()->user()
+            ->activeSubscription
+            ?->courses()
+            ->where('courses.id', $course->id)
+            ->exists() ?? false;
     }
+
+    return view('student.courses.show', compact('course', 'hasAccess'));
+}
 }

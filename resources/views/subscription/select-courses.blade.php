@@ -215,32 +215,44 @@
                                     {{ $course->description }}
                                 </p>
 
-                                @if($isEnrolled)
-                                    {{-- Enrolled - Show Start Learning Button --}}
+                                <div class="flex flex-col gap-2">
+                                    @if($isEnrolled)
+                                        {{-- Enrolled - Show Start Learning Button --}}
+                                        <a href="{{ route('courses.show', $course) }}"
+                                           class="block w-full py-3 bg-green-500 hover:bg-green-600 text-white text-center font-bold rounded-xl transition-all">
+                                            <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            Start Learning
+                                        </a>
+                                    @elseif($remaining > 0)
+                                        {{-- Not Enrolled & Has Slots - Show Enroll Button --}}
+                                        <button onclick="openModal({{ $course->id }}, '{{ addslashes($course->title) }}')"
+                                                class="w-full py-3 rounded-xl font-bold text-sm transition-all duration-200 bg-orange-500 hover:bg-orange-600 text-white">
+                                            <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                            </svg>
+                                            Enroll Now
+                                        </button>
+                                    @else
+                                        {{-- No Slots Remaining --}}
+                                        <button disabled
+                                                class="w-full py-3 rounded-xl font-bold text-sm bg-gray-200 text-gray-400 cursor-not-allowed">
+                                            🔒 Limit Reached
+                                        </button>
+                                    @endif
+
+                                    {{-- View Details - Always Visible --}}
                                     <a href="{{ route('courses.show', $course) }}"
-                                       class="block w-full py-3 bg-green-500 hover:bg-green-600 text-white text-center font-bold rounded-xl transition-all">
-                                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                       class="block w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-center font-semibold rounded-xl transition-all text-sm">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                         </svg>
-                                        Start Learning
+                                        View Details
                                     </a>
-                                @elseif($remaining > 0)
-                                    {{-- Not Enrolled & Has Slots - Show Enroll Button --}}
-                                    <button onclick="openModal({{ $course->id }}, '{{ addslashes($course->title) }}')"
-                                            class="w-full py-3 rounded-xl font-bold text-sm transition-all duration-200 bg-orange-500 hover:bg-orange-600 text-white">
-                                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                        </svg>
-                                        Enroll Now
-                                    </button>
-                                @else
-                                    {{-- No Slots Remaining --}}
-                                    <button disabled
-                                            class="w-full py-3 rounded-xl font-bold text-sm bg-gray-200 text-gray-400 cursor-not-allowed">
-                                        🔒 Limit Reached
-                                    </button>
-                                @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -310,13 +322,24 @@
         btn.innerHTML = '<svg class="animate-spin h-5 w-5 inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>';
 
         try {
-            const response = await fetch(`/subscription/add-course/${pendingCourseId}`, {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+
+            if (!csrfToken) {
+                showToast('CSRF token not found!', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Yes, Enroll';
+                return;
+            }
+
+            const response = await fetch('/subscription/add-course/' + pendingCourseId, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json'
-                }
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({})
             });
 
             const data = await response.json();
@@ -324,8 +347,6 @@
             if (data.success) {
                 showToast('🎉 ' + data.message, 'success');
                 closeModal();
-
-                // Reload page after short delay
                 setTimeout(() => {
                     location.reload();
                 }, 1500);
@@ -335,6 +356,7 @@
                 btn.textContent = 'Yes, Enroll';
             }
         } catch (error) {
+            console.error('Error:', error);
             showToast('Something went wrong. Please try again.', 'error');
             btn.disabled = false;
             btn.textContent = 'Yes, Enroll';

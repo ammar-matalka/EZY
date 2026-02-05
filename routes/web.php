@@ -119,7 +119,6 @@ Route::middleware(['auth', 'student'])->prefix('student')->name('student.')->gro
     Route::get('learn/{enrollment}', [\App\Http\Controllers\Student\EnrollmentController::class, 'learn'])->name('learn');
 
 });
-Route::post('/subscribe/{plan}', [\App\Http\Controllers\Student\SubscriptionController::class, 'subscribe'])->name('subscribe');
 
 
 
